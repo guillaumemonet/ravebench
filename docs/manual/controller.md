@@ -25,7 +25,7 @@ What each APC button does, the K1-K8 knobs and the performance effects.
 | **STOP ALL CLIPS** | Stops everything |
 | **Shift + STOP ALL CLIPS** | Turn the pad grid into the 40 scenes (and back) |
 
-**LEDs**: a loaded pad shows its colour, and a playing pad is fully lit or blinks. The mk1 only has three colours (red, green, yellow), so the colour picker shows those three when an mk1 is connected.
+**LEDs**: a loaded pad shows its colour, and a playing pad is fully lit or blinks. The mk1 only has three colours (red, green, yellow): its LEDs show the nearest one, while the screen keeps the colour you chose.
 
 Everything can also be done with the mouse. On the computer keyboard, the middle row plays notes and **Z / X** change the octave.
 

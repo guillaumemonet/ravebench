@@ -40,10 +40,14 @@ export function guessCat(name = '') {
 // Familles du catalogue (l'ordre et les types viennent de sounds/library.json : `tree`), puis les sons de l'utilisateur.
 export const MY_SOUNDS = 'My Sounds';
 export const RECORDINGS = 'Recordings';
-// Couleur d'une famille = celle de sa catégorie de mixage.
+// Couleur d'une famille à l'écran (bibliothèque) : une couleur franche par famille, indépendante de la palette du
+// contrôleur (les pads gardent les couleurs de l'APC, que ses LED peuvent afficher).
+const FAMILY_COLORS = { Drums: '#ff5a5f', Bass: '#ff9f1c', Leads: '#b36cff', Keys: '#ff6fb5', 'Pads & Strings': '#2ec4b6', Vocals: '#ffd23f',
+  FX: '#4dabf7', Guitars: '#c8895a', 'My Sounds': '#7bd88f', Recordings: '#b8bcc8' };
+export const familyColor = family => FAMILY_COLORS[family] ?? '#9aa0ad';
+// Catégorie de mixage d'une famille (sons du catalogue hors banque).
 const FAMILY_CAT = { Drums: 'drums', Bass: 'bass', Leads: 'lead', Keys: 'keys', 'Pads & Strings': 'pad', Vocals: 'voice', FX: 'fx', Guitars: 'guitar',
   [MY_SOUNDS]: 'mine', [RECORDINGS]: 'rec' };
-export const familyColor = family => catColor(FAMILY_CAT[family] ?? 'drums');
 // Place dans l'arbre d'un son sans entrée au catalogue (kit de départ, son importé) d'après sa catégorie de mixage.
 const CAT_PLACE = { kick: ['Drums', 'Kicks'], drums: ['Drums', 'Percussion'], bass: ['Bass', 'Synth Bass'], lead: ['Leads', 'Synth Leads'],
   keys: ['Keys', 'Stabs'], pad: ['Pads & Strings', 'Pads'], voice: ['Vocals', 'Vocal FX'], fx: ['FX', 'Bleeps'], guitar: ['Guitars', 'Riffs'] };

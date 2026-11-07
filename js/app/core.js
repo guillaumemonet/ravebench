@@ -1,7 +1,7 @@
 // Socle partagé : état de l'application (state), moteurs créés au démarrage, constantes et petits utilitaires.
 import { defaultAcidState } from '../acid.js';
 import { defaultMasterState } from '../audio.js';
-import { MK1_PICKER_COLORS, PICKER_COLORS, mk1Equivalent } from '../apc.js';
+import { PICKER_COLORS } from '../apc.js';
 import { defaultDecksState } from '../decks.js';
 import { translatePage } from '../i18n.js';
 import { defaultKickState } from '../kickdesign.js';
@@ -115,9 +115,9 @@ export const playing = new Map();   // clé voix (banque*40 + pad) -> mode
 export let shiftHeld = false;
 
 export const padKey = (bank, i) => bank * 40 + i;
-// Le mk1 n'a que 3 couleurs : l'interface montre la couleur réelle de la LED.
-export const uiColor = c => (state.model === 'mk1' ? mk1Equivalent(c) : c);
-export const pickerColors = () => (state.model === 'mk1' ? MK1_PICKER_COLORS : PICKER_COLORS);
+// L'écran montre toujours la couleur choisie ; un mk1 (3 couleurs) l'approche seulement sur ses LED (js/apc.js).
+export const uiColor = c => c;
+export const pickerColors = () => PICKER_COLORS;
 export const currentPad = () => state.banks[state.bank][state.selected];
 export const newPad = (name, color, sampleId, buffer, bpm = 0) => ({ name, color, sampleId, buffer, bpm, p: defaultPositions('pad') });
 

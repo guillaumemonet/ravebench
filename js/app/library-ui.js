@@ -1,11 +1,11 @@
 // Fenêtre de la bibliothèque de sons.
 import { PALETTE } from '../apc.js';
 import { t } from '../i18n.js';
-import { MY_SOUNDS, catColor, familyColor, libraryItems, libraryTree } from '../library.js';
+import { MY_SOUNDS, familyColor, libraryItems, libraryTree } from '../library.js';
 import { BEATS_PER_BAR } from '../timeline.js';
 import { FX_FAMILY_COLORS } from '../trackfx.js';
 import { loadItemIntoPad } from './actions.js';
-import { $, engine, kit, state, uiColor } from './core.js';
+import { $, engine, kit, state } from './core.js';
 import { deleteCurve, openCurve } from './curve-ui.js';
 import { loadDeck } from './decks-ui.js';
 import { padEls } from './pads.js';
@@ -87,7 +87,7 @@ export function renderLibrary() {
   const sounds = libTab === 'sounds';
   const tree = sounds ? libraryTree(libManifest, items) : null;
   const cats = sounds ? tree.map(n => ({ id: n.family, color: familyColor(n.family), label: n.family }))
-    : FX_FAMILIES.map(id => ({ id, color: FX_FAMILY_COLORS[id], label: t(`tfx.family.${id}`) }));
+    : FX_FAMILIES.map(id => ({ id, color: PALETTE[FX_FAMILY_COLORS[id]], label: t(`tfx.family.${id}`) }));
   const kindOk = i => !sounds || libKind === 'all' || (libKind === 'loop') === !!i.loop;
   const inCat = i => (sounds ? i.family : i.cat) === libCat;
   const pick = () => { libQuery = ''; $('#lib-search').value = ''; renderLibrary(); };
@@ -96,7 +96,7 @@ export function renderLibrary() {
   for (const c of cats) {
     const n = items.filter(i => (sounds ? i.family : i.cat) === c.id && kindOk(i)).length;
     if (!n && (c.id === MY_SOUNDS || c.id === 'Recordings')) continue;
-    $('#lib-cats').appendChild(chip('lib-cat', c.label, PALETTE[uiColor(c.color)], n, c.id === libCat && !libQuery, () => { libCat = libCats[libTab] = c.id; libType = ''; pick(); }));
+    $('#lib-cats').appendChild(chip('lib-cat', c.label, c.color, n, c.id === libCat && !libQuery, () => { libCat = libCats[libTab] = c.id; libType = ''; pick(); }));
   }
   // Types de la famille choisie, et le filtre coups / boucles.
   const types = $('#lib-types');
@@ -106,7 +106,7 @@ export function renderLibrary() {
   for (const b of $('#lib-kind').children) b.classList.toggle('active', b.dataset.kind === libKind);
   if (sounds && !libQuery) {
     const node = tree.find(n => n.family === libCat);
-    const color = PALETTE[uiColor(familyColor(libCat))];
+    const color = familyColor(libCat);
     const inFamily = items.filter(i => inCat(i) && kindOk(i));
     if (libType && !inFamily.some(i => i.type === libType)) libType = '';
     types.appendChild(chip('lib-type', t('lib.all'), color, inFamily.length, !libType, () => { libType = ''; renderLibrary(); }));
@@ -121,7 +121,7 @@ export function renderLibrary() {
     const row = document.createElement('div');
     row.className = 'lib-item' + (libSelected?.sampleId === item.sampleId ? ' selected' : '');
     row.dataset.id = item.sampleId;
-    row.style.setProperty('--c', item.kind === 'fx' ? fxColor(item) : PALETTE[uiColor(catColor(item.cat))]);
+    row.style.setProperty('--c', item.kind === 'fx' ? fxColor(item) : familyColor(item.family));
     const small = item.kind === 'fx' ? t(`tfx.family.${item.family}`) : [item.note, item.loop ? t('lib.bars', { n: item.bars || '↻' }) : t('lib.oneshot')].filter(Boolean).join(' · ');
     row.innerHTML = `<i></i><span>${item.name}</span><small>${small}</small>`;
     if (item.kind === 'fx') row.title = t(item.curveId ? 'curve.libTitle' : 'tfx.libTitle');
@@ -159,7 +159,7 @@ export function startLibDrag(e, item) {
       ghost = document.createElement('div');
       ghost.className = 'lib-ghost';
       ghost.textContent = item.name;
-      ghost.style.setProperty('--c', PALETTE[uiColor(catColor(item.cat))]);
+      ghost.style.setProperty('--c', item.kind === 'fx' ? fxColor(item) : familyColor(item.family));
       document.body.appendChild(ghost);
     }
     ghost.style.left = `${ev.clientX + 12}px`;

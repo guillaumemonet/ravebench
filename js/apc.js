@@ -24,8 +24,6 @@ export const PALETTE = [
 
 // Couleurs proposées dans l'interface (indices de la palette).
 export const PICKER_COLORS = [5, 60, 9, 96, 13, 109, 17, 21, 29, 33, 37, 41, 45, 49, 81, 53, 57, 3];
-// mk1 : seules couleurs possibles (rouge, vert, jaune), exprimées en indices de palette.
-export const MK1_PICKER_COLORS = [5, 21, 13];
 
 // mk1 : pads tricolores (vérifié sur l'appareil). +1 = clignotant.
 const MK1 = { off: 0, green: 1, red: 3, yellow: 5 };
@@ -62,11 +60,6 @@ function mk1Color(paletteIndex) {
   if (r > 150 && g > 150) return MK1.yellow;
   if (r >= g && r >= b) return g > r * 0.45 ? MK1.yellow : MK1.red;
   return MK1.green;
-}
-
-// Couleur réellement affichée par un mk1, en indice de palette (pour l'interface).
-export function mk1Equivalent(paletteIndex) {
-  return { [MK1.red]: 5, [MK1.green]: 21, [MK1.yellow]: 13 }[mk1Color(paletteIndex)] ?? 0;
 }
 
 export class APC extends EventTarget {

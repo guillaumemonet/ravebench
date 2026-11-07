@@ -25,7 +25,7 @@ Ce que fait chaque bouton de l'APC, les potentiomètres K1-K8 et les effets de p
 | **STOP ALL CLIPS** | Coupe tout |
 | **Maj + STOP ALL CLIPS** | Transformer la grille de pads en 40 scènes (et revenir) |
 
-**LEDs** : un pad chargé prend sa couleur, et un son en cours est allumé à fond ou clignote. Le mk1 n'a que trois couleurs (rouge, vert, jaune), donc le sélecteur de couleur n'affiche que celles-là quand un mk1 est branché.
+**LEDs** : un pad chargé prend sa couleur, et un son en cours est allumé à fond ou clignote. Le mk1 n'a que trois couleurs (rouge, vert, jaune) : ses LED affichent la plus proche, l'écran garde la couleur que vous avez choisie.
 
 Tout se fait aussi à la souris. Sur le clavier de l'ordinateur, la rangée du milieu joue des notes (Q S D F… en AZERTY) et **W / X** changent d'octave.
 
