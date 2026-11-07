@@ -80,12 +80,21 @@ The instruments are saved with the project, under each device's name: they come 
 
 The APC Key 25 is not the only option: **any MIDI keyboard or controller** plugged in by USB (no driver needed for most of them) is recognised, alongside the APC. The **MIDI** window (plugin bar, System group) lists them.
 
-- **Its keys** play the synth of the active window, like the APC keyboard (chords, arpeggiator and timeline recording included); **its sustain pedal** holds the notes.
+- **Its keys** play the synth of the active window, like the APC keyboard (chords, arpeggiator and timeline recording included); **its sustain pedal** holds the notes. Keyboards of 25 to 88 keys are recognised (the number of keys is read from the device name, or set in the list of connected devices).
+- **Changing the sound from the keyboard**: the sound or program buttons of a keyboard (Program Change, with its bank select) pick a preset of the instrument the device plays, in the order of its preset menu (ready-made ones by category, then yours ★): program 1 = the first sound, program 2 = the second… With bank select, each bank adds 128. A device that plays the pads changes the displayed bank; a device that follows the active window changes the sound of the instrument of the active page. A message shows the chosen sound.
 - **MIDI learn**: in the MIDI window, click **Learn** next to a target, then move a knob or fader, or press a button on the device. Esc cancels; the bin removes an assignment.
 - **Targets**: knobs **K1 to K8 of the active page** (exactly like the APC knobs: synth, effects, pads, mixer…), the **mixer faders**, the **master volume**, the **bus volumes**, and the transport: **play / stop**, **stop**, **record**, **loop**.
 - A control drives only one target (assigning it again removes it from the old one). A key or pad assigned to a button no longer plays a note.
 - **MIDI clock**: **Send to** a device (drum machine, sequencer, other software): it receives the clock (24 pulses per beat), Start, Stop and the position, and follows the timeline even when you jump to a marker. **Follow** a device: Ravebench takes its tempo and starts / stops with it.
 - Assignments are saved with the project. At the bottom of the window, the **monitor** shows the last messages received from each device.
+
+## External MIDI instruments
+
+A timeline track can play a **MIDI instrument** instead of the sounds of Ravebench: hardware synth, groovebox, digital piano or sound module, or another program through a virtual MIDI cable.
+
+- Right-click the track header › **External MIDI instrument…**: choose the **instrument** (the MIDI outputs connected), its **channel** (1 to 16) and its **sound**: the 128 sounds of the **General MIDI** set, by family (Piano, Organ, Bass, Strings, Synth Lead, Synth Pad…), understood by most digital pianos, keyboards and sound modules; **Bank** (MSB / LSB) reaches the other sound banks of the instrument (see its manual). **Test note** plays a C so you can hear it.
+- The **note blocks** of the track then play on the instrument (audio and pad blocks of the track keep playing in Ravebench). Its sound is sent when playback starts and as soon as you change it; notes leave on time, aligned with what you hear; Stop releases every note. A **MIDI** badge marks the track (click it to change the settings). A muted track sends nothing.
+- The instrument's sound does not come back into Ravebench by itself: to hear it in the mix, export or freeze it, plug its audio output into the sound card and record it on a track (see Audio input in [Files](files.md)). The settings are saved with the project; an unplugged instrument is kept and comes back when it is plugged in again.
 
 ---
 

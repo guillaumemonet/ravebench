@@ -11,7 +11,7 @@ import { BUS_COUNT } from '../timeline.js';
 import { turnKnob } from './actions.js';
 import { busName, renderBus } from './buses-ui.js';
 import { monitorLog, setStatus } from './controller.js';
-import { deviceKey, devicePage } from './devices.js';
+import { deviceKey, devicePage, deviceProgram } from './devices.js';
 import { $, apc, engine, mixer, oscSynth, state, timeline } from './core.js';
 import { masterDef, renderMixer, renderStrip } from './mixer-ui.js';
 import { save } from './save.js';
@@ -129,6 +129,7 @@ export async function initMidi() {
   midiHub.isCommand = (port, ch, n) => state.midiMap.some(m => m.kind === 'note' && same(m, { port, ch, kind: 'note', n }));
   // Un appareil associé à un instrument le joue ; sinon même chemin que le clavier de l'APC (fenêtre active).
   midiHub.addEventListener('key', e => { if (!deviceKey(e.detail.port, e.detail)) apc.dispatchEvent(new CustomEvent('key', { detail: e.detail })); });
+  midiHub.addEventListener('program', e => deviceProgram(e.detail.port, e.detail));
   midiHub.addEventListener('pedal', e => { engine.setSustain(e.detail.on); oscSynth?.setSustain?.(e.detail.on); });
   midiHub.addEventListener('cc', ({ detail: d }) => onControl({ port: d.port, ch: d.ch, kind: 'cc', n: d.cc }, d.value, d.value >= 64));
   midiHub.addEventListener('button', ({ detail: d }) => onControl({ port: d.port, ch: d.ch, kind: 'note', n: d.note }, d.on ? 127 : 0, d.on));

@@ -15,6 +15,7 @@ import { $, acid, drum, drum808, engine, metro, mixer, state, stepSeq, timeline,
 import { openDemoMenu } from './demo.js';
 import { exportSong, songEndBeats } from './export.js';
 import { bounceTrack, freezeState, freezeTrack, openTrackMenu, unfreezeTrack } from './freeze.js';
+import { midiOutLabel, openMidiOut } from './midi-out-ui.js';
 import { BUS_COLORS, BUS_LETTERS, busName, renderBuses } from './buses-ui.js';
 import { inputLatency, inputNode, openInput } from './audio-input.js';
 import { autoHead, renderAutoHead, renderAutoLane } from './automation-ui.js';
@@ -304,7 +305,7 @@ export function buildTrackRows() {
   state.tl.tracks.forEach((_, i) => {
     const head = document.createElement('div');
     head.className = 'tl-head';
-    head.innerHTML = `<i class="tl-src" hidden></i><span class="tl-name" title="${t('tl.renameTitle')}"></span><b class="tl-bus" hidden></b><button class="tl-frozen icon-only" data-icon="freeze" hidden></button><button class="tl-knobs icon-only" data-icon="dial" title="${t('tl.knobs')}" aria-label="${t('tl.knobs')}"></button><button class="tl-arm" title="${t('tl.arm')}">●</button><button class="tl-mute" title="${t('mix.mute')}">M</button><button class="tl-solo" title="${t('tl.soloTitle')}">S</button>`;
+    head.innerHTML = `<i class="tl-src" hidden></i><span class="tl-name" title="${t('tl.renameTitle')}"></span><b class="tl-bus" hidden></b><b class="tl-ext" hidden>MIDI</b><button class="tl-frozen icon-only" data-icon="freeze" hidden></button><button class="tl-knobs icon-only" data-icon="dial" title="${t('tl.knobs')}" aria-label="${t('tl.knobs')}"></button><button class="tl-arm" title="${t('tl.arm')}">●</button><button class="tl-mute" title="${t('mix.mute')}">M</button><button class="tl-solo" title="${t('tl.soloTitle')}">S</button>`;
     head.querySelector('.tl-name').addEventListener('dblclick', e => renameTrack(i, e.currentTarget));
     head.querySelector('.tl-arm').addEventListener('click', () => { const tr = state.tl.tracks[i]; tr.arm = !tr.arm; renderTl(); save(); });
     head.querySelector('.tl-mute').addEventListener('click', () => { state.tl.tracks[i].mute = !state.tl.tracks[i].mute; timeline.updateMutes(); renderTl(); save(); });
@@ -312,6 +313,7 @@ export function buildTrackRows() {
     head.querySelector('.tl-knobs').addEventListener('click', e => openTrackKnobs(i, e.currentTarget));
     // Menu de la piste (geler, rendre en audio) : clic droit sur l'en-tête, ou le badge d'une piste gelée.
     head.querySelector('.tl-frozen').addEventListener('click', e => { const r = e.currentTarget.getBoundingClientRect(); openTrackMenu(i, r.left, r.bottom + 4); });
+    head.querySelector('.tl-ext').addEventListener('click', e => { const r = e.currentTarget.getBoundingClientRect(); openMidiOut(i, r.left, r.bottom + 4); });
     head.addEventListener('contextmenu', e => { if (e.target.closest('input')) return; e.preventDefault(); openTrackMenu(i, e.clientX, e.clientY); });
     autoHead(head, i);
     const lane = document.createElement('div');
@@ -535,6 +537,10 @@ export function renderTrackHeads() {
     const bus = h.querySelector('.tl-bus');
     bus.hidden = tr.bus === null || tr.bus === undefined;
     if (!bus.hidden) { bus.textContent = BUS_LETTERS[tr.bus]; bus.style.setProperty('--bc', BUS_COLORS[tr.bus]); bus.title = t('tl.inBus', { bus: busName(tr.bus) }); }
+    // Badge « MIDI » : les blocs de notes jouent un instrument MIDI externe (clic : ses réglages).
+    const ext = h.querySelector('.tl-ext');
+    ext.hidden = !tr.midi;
+    if (tr.midi) ext.title = t('mout.badge', { what: midiOutLabel(tr.midi) });
     // Badge « gelée » : le son rendu joue à la place des blocs (il clignote pendant le rendu).
     const fz = h.querySelector('.tl-frozen');
     const frz = freezeState(i);

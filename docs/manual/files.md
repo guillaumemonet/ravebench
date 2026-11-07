@@ -26,8 +26,8 @@ Your banks, sounds and settings are saved automatically in the browser.
 
 ## MIDI files
 
-- **MIDI** (timeline bar, next to WAV and Stems) exports the **note blocks** to a `.mid` file at the song tempo, to open in any other program: one MIDI track per timeline track (patterns unrolled over the whole block length, transpositions included). Pad hits placed on the timeline go to **channel 10** (notes 36 and up). A MIDI file holds notes, not sounds: audio blocks are not in it.
-- **Open…** (header or timeline) also imports a `.mid` file: each track of the file becomes a **note block**, placed at the playhead bar on a track that is free for its length (tracks are added if needed). The blocks play with the keyboard synth; edit them in the piano roll or pick their sound in its menu. The song tempo does not change (the file's tempo is shown).
+- **MIDI** (timeline bar, next to WAV and Stems) exports the **note blocks** to a `.mid` file at the song tempo, to open in any other program: one MIDI track per timeline track, each on its own channel with its **General MIDI sound** (the one closest to the preset its blocks play, or the sound of its external instrument), so any MIDI player plays it with the right instruments (patterns unrolled over the whole block length, transpositions included). Pad hits placed on the timeline go to **channel 10** (notes 36 and up). A MIDI file holds notes, not sounds: audio blocks are not in it.
+- **Open…** (header or timeline) also imports a `.mid` file: each channel of each track of the file becomes a **note block**, placed at the playhead bar on a track that is free for its length (tracks are added if needed). Each block plays the **preset closest to its General MIDI sound** (strings, bass, piano, pads, leads…); channel 10 (drums) plays the keyboard synth; edit them in the piano roll or pick their sound in its menu. The song tempo does not change (the file's tempo is shown).
 
 ## Tracker modules (.mod, .xm)
 

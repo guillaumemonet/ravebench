@@ -4,8 +4,10 @@
 // instrument associé, page des potentiomètres, Reconnecter, Paramètres (fenêtre MIDI).
 import { t } from '../i18n.js';
 import { Performer } from '../performer.js';
-import { triggerPad, releasePad, setPage } from './actions.js';
-import { $, UI_PAGES, apc, drum, drum808, engine, kickSynth, oscSynth, state, wm } from './core.js';
+import { setBank, triggerPad, releasePad, setPage } from './actions.js';
+import { $, BANKS, UI_PAGES, apc, drum, drum808, engine, kickSynth, oscSynth, state, wm } from './core.js';
+import { toast } from './misc.js';
+import { acidPresets, drumPresets, kickPresets, oscPresets, presetOrder, synthPresets } from './presets-bar.js';
 import { pageLabel } from './knobs.js';
 import { renderKeysTarget } from './osc-ui.js';
 import { buildPiano, pianoCount } from './piano.js';
@@ -132,6 +134,26 @@ export function deviceKey(id, { note, velocity, on }) {
   else if (inst === 'kick') kickSynth.noteOn(note, velocity, undefined, `dev:${id}:${note}`, state.kick.params);
   notes.set(note, inst);
   return true;
+}
+
+// Changement de son (Program Change) reçu : le preset n° (programme + 128 × banque) de l'instrument de l'appareil, dans
+// l'ordre de son menu de presets (ceux fournis par catégorie, puis les vôtres) ; pour les pads, la banque de ce numéro.
+// Un appareil qui suit la fenêtre active change le son de l'instrument de la page en cours.
+const PAGE_INST = Object.fromEntries(Object.entries(INST_PAGE).map(([inst, page]) => [page, inst]));
+export function deviceProgram(id, { program, bank = 0 }) {
+  let inst = deviceInst(id);
+  if (inst === 'auto') inst = PAGE_INST[state.page] ?? (state.page === 'kick' ? 'kick' : 'synth');
+  const n = program + 128 * bank;
+  if (inst === 'pads') {
+    if (n < BANKS) { setBank(n); toast(t('dev.programBank', { n: n + 1 }), 1500); }
+    return;
+  }
+  const bar = { synth: synthPresets, osc: oscPresets, acid: acidPresets, tr: drumPresets.tr, tr8: drumPresets.tr8, kick: kickPresets }[inst];
+  const p = bar && presetOrder(bar.cfg)[n];
+  if (!p) return;
+  bar.cfg.apply(p.id);
+  bar.render();
+  toast(t('dev.program', { n: n + 1, name: `${bar.cfg.user().includes(p) ? '★ ' : ''}${p.name}` }), 1500);
 }
 
 // ---------- Activité (une LED par appareil) ----------

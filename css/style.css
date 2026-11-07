@@ -915,6 +915,15 @@ header button, header .status { white-space: nowrap; }
 .bus-tracks { font-size: 10.5px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 14px; }
 .tl-head .tl-bus { flex: none; font-size: 10px; line-height: 14px; min-width: 14px; text-align: center; border-radius: 3px; background: var(--bc); color: #111; }
 .tl-head .tl-bus[hidden] { display: none; }
+.tl-head .tl-ext { flex: none; font-size: 9px; line-height: 14px; padding: 0 3px; border-radius: 3px; background: var(--accent); color: #fff; cursor: pointer; letter-spacing: .03em; }
+.tl-head .tl-ext[hidden] { display: none; }
+.mout-panel { width: 340px; }
+.mout-panel .cm-row { grid-template-columns: 90px 1fr; }
+.mout-panel select { min-width: 0; width: 100%; }
+.mout-bank { display: flex; gap: 6px; }
+.mout-num { width: 64px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 2px 4px; }
+.mout-panel .hint { margin: 6px 8px; font-size: 11px; }
+.mout-btns { display: flex; justify-content: flex-end; padding: 2px 8px 6px; }
 /* Menu contextuel d'un bloc de la timeline */
 .clip-menu { position: fixed; z-index: 1000; width: 270px; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.5); font-size: 12px; }
 .cm-head { padding: 4px 8px 6px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid var(--line); margin-bottom: 4px; }

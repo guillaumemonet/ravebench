@@ -111,7 +111,15 @@ export function cleanTrack(tr) {
     autoParam: tr?.autoParam in AUTO_PARAMS ? tr.autoParam : 'vol',      // réglage affiché dans la ligne d'automation
     autoOpen: !!tr?.autoOpen,                                            // ligne d'automation ouverte
     frozen: !!tr?.frozen,                                                // piste gelée : jouée depuis son rendu audio (js/app/freeze.js)
+    midi: cleanMidiOut(tr?.midi),                                        // instrument MIDI externe qui joue ses blocs de notes (js/midiout.js)
   };
+}
+// Sortie MIDI d'une piste : { port (nom de la sortie), ch (voie 0..15), prog (son 0..127, -1 : ne pas l'envoyer),
+// bank (msb * 128 + lsb) }, ou null (les blocs jouent les sons de Ravebench).
+export function cleanMidiOut(m) {
+  if (!m || typeof m.port !== 'string' || !m.port || m.port.length > 120) return null;
+  return { port: m.port, ch: Number.isInteger(m.ch) && m.ch >= 0 && m.ch < 16 ? m.ch : 0, prog: Number.isInteger(m.prog) && m.prog >= -1 && m.prog < 128 ? m.prog : -1,
+    bank: Number.isInteger(m.bank) && m.bank >= 0 && m.bank < 16384 ? m.bank : 0 };
 }
 
 export function defaultTlState() {
@@ -164,6 +172,7 @@ export class Timeline {
     this.onStop = () => {};
     this.onTransport = () => {};   // (lecture ?, temps, instant audio) : départ / arrêt (horloge MIDI) ; branché par l'application
     this.getPad = () => null;   // (banque, pad) -> pad ; branché par l'application
+    this.midiOutFor = null;     // (piste) -> sortie vers son instrument MIDI externe, ou null ; branché par l'application (js/app/midi-out-ui.js)
     this.loadPad = () => {};    // décode le son d'un pad (chargement à la demande) ; branché par l'application
     this.padKey = null;
     // Sidechain (branché par l'application) : kicks d'un bloc en temps depuis son début (null si aucun),
@@ -215,6 +224,8 @@ export class Timeline {
     const start = Math.max(this.ctx.currentTime + 0.03, at ?? this.ctx.currentTime + 0.08);
     // Boucles des pads et 909 calées sur les mesures de la timeline.
     this.engine.origin = start - beat * this.beatDur;
+    // Instruments MIDI externes : leur son (banque, programme) avant les premières notes.
+    for (const tr of this.st.tracks) if (tr.midi && tr.midi.prog >= 0) this.midiOutFor?.(tr)?.program(tr.midi.prog, tr.midi.bank);
     this.playing = true;
     this.cycles = [];
     this.scheduleCycle(start, beat);
@@ -260,17 +271,20 @@ export class Timeline {
         }
         return;
       }
+      // Piste reliée à un instrument MIDI externe : ses blocs de notes partent vers lui (rien s'il est débranché ou muet).
+      const ext = track.midi ? this.midiOutFor?.(track) ?? null : null;
       for (const clip of track.clips) {
         if (clip.type === 'note') {
+          if (track.midi && (!ext || !live)) continue;
           // Chaque note du bloc (motif répété) ; une note déjà commencée (lecture partie du milieu d'un bourdon,
           // d'une note tenue) part tout de suite pour le temps qui lui reste.
           // Kick du designer (clip.kick : mélodie de kick), synthé à oscillateurs (clip.osc), instrument échantillon
           // (clip.smps : pads joués en notes, n.s = lequel) ou synthé du clavier (preset du bloc, sinon celui en cours).
-          const kick = clip.kick ? this.getKick(clip) : null;
-          const osc = !kick && clip.osc ? this.getOsc(clip) : null;
-          const smp = !kick && !osc && clip.smps ? this.sampleSynth() : null;
-          const syn = kick?.synth ?? osc?.synth ?? smp ?? this.engine;
-          const patch = kick ? kick.values : osc ? osc.values : clip.preset && !smp ? this.getPatch(clip.preset) : undefined;
+          const kick = !ext && clip.kick ? this.getKick(clip) : null;
+          const osc = !ext && !kick && clip.osc ? this.getOsc(clip) : null;
+          const smp = !ext && !kick && !osc && clip.smps ? this.sampleSynth() : null;
+          const syn = ext ?? kick?.synth ?? osc?.synth ?? smp ?? this.engine;
+          const patch = ext ? undefined : kick ? kick.values : osc ? osc.values : clip.preset && !smp ? this.getPatch(clip.preset) : undefined;
           // Preset du bloc : après la saturation et le chorus du clavier (le preset a les siens, Engine.colorBus).
           const dest = kick ? kick.synth.out : osc ? osc.synth.out : smp ? this.engine.padBus : patch ? this.engine.synthPost : this.engine.synthIn;
           const events = osc && osc.synth.isMono(osc.values) ? monoLine(clipEvents(clip)) : clipEvents(clip);
@@ -288,7 +302,7 @@ export class Timeline {
               ev = { pv: n.pv, pp: n.pp, ofs: n.ofs, pan: n.pan, bd, skip: (at - at0) * bd };
             }
             const key = `${this.keyPrefix}${clip.id}:${n.i}`;
-            const out = this.trackIn(ti, dest);
+            const out = ext ? null : this.trackIn(ti, dest);
             const note = clip.tune ? tunedNote(n.note, clip.tune) : n.note;   // justesse propre de l'instrument (cornemuse)
             jobs.push({ time: when, run: () => {
               this.synths.add(syn);

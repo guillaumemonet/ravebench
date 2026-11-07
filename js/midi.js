@@ -1,6 +1,7 @@
 // Autres appareils MIDI que l'APC Key 25 (claviers maîtres, contrôleurs) : notes, pédale de sustain, contrôleurs
 // (potentiomètres, faders, boutons). Événements :
 //   key { port, note, velocity (0..1), on }   pedal { on }   cc { port, ch, cc, value (0..127) }
+//   program { port, ch, program (0..127), bank (sélection de banque CC0 / CC32 reçue avant : msb * 128 + lsb) }
 //   button { port, ch, note, on }  (note assignée à une commande par le MIDI learn, ou note reçue pendant l'apprentissage)
 //   realtime { port, byte, ms }  (horloge 0xF8, Start 0xFA, Continue 0xFB, Stop 0xFC)
 //   raw { port, data }   connection { inputs: [noms], outputs: [noms] }
@@ -14,6 +15,7 @@ export class MidiHub extends EventTarget {
     this.outputs = [];   // sorties MIDI (autres que l'APC) : envoi de l'horloge
     this.learning = false;   // MIDI learn en cours : les notes servent à l'assignation, elles ne jouent pas
     this.isCommand = () => false;   // (port, canal, note) -> note assignée à une commande (elle ne joue pas) ; branché par l'application
+    this.banks = new Map();   // « port:canal » -> [msb, lsb] de la dernière sélection de banque
   }
 
   emit(type, detail) { this.dispatchEvent(new CustomEvent(type, { detail })); }
@@ -57,8 +59,16 @@ export class MidiHub extends EventTarget {
       const on = type === 0x90 && d2 > 0;
       if (this.learning || this.isCommand(port, ch, d1)) { this.emit('button', { port, ch, note: d1, on }); return; }
       this.emit('key', { port, note: d1, velocity: on ? d2 / 127 : 0, on });
+    } else if (type === 0xc0) {
+      const [msb, lsb] = this.banks.get(`${port}:${ch}`) ?? [0, 0];
+      this.emit('program', { port, ch, program: d1, bank: msb * 128 + lsb });
     } else if (type === 0xb0) {
       if (d1 === 64 && !this.learning) { this.emit('pedal', { on: d2 >= 64 }); return; }
+      if (d1 === 0 || d1 === 32) {   // sélection de banque : gardée pour le prochain changement de son
+        const b = this.banks.get(`${port}:${ch}`) ?? [0, 0];
+        b[d1 === 0 ? 0 : 1] = d2;
+        this.banks.set(`${port}:${ch}`, b);
+      }
       this.emit('cc', { port, ch, cc: d1, value: d2 });
     }
   }

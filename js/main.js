@@ -30,6 +30,7 @@ import { buildCurve } from './app/curve-ui.js';
 import { buildDecks } from './app/decks-ui.js';
 import { FILE_TOOLS, bindFiles, bindKits, openFile, kitExportBank, kitImport, saveFile } from './app/files.js';
 import { buildFreeze } from './app/freeze.js';
+import { buildMidiOut } from './app/midi-out-ui.js';
 import { buildBreizh } from './app/breizh-ui.js';
 import { buildBankMgr, mgrBank } from './app/banks-ui.js';
 import { buildBuildup } from './app/buildup-ui.js';
@@ -196,6 +197,7 @@ async function start() {
   buildSidechain();
   buildTl();
   buildFreeze();
+  buildMidiOut();
   buildMarkers();
   $('#tl-midi').addEventListener('click', exportMidi);   // blocs de notes -> fichier .mid
   buildRoll();

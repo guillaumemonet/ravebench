@@ -14,7 +14,8 @@ const text = s => [...new TextEncoder().encode(s)];
 function chunk(id, data) { return [...text(id), ...u32(data.length), ...data]; }
 
 /**
- * @param {{ name: string, channel?: number, notes: { t: number, len: number, note: number, vel?: number }[] }[]} tracks
+ * program : son General MIDI (0..127) envoyé au début de la piste (Program Change), avec sa banque éventuelle.
+ * @param {{ name: string, channel?: number, program?: number, bank?: number, notes: { t: number, len: number, note: number, vel?: number }[] }[]} tracks
  * @param {number} bpm
  * @returns {Uint8Array}
  */
@@ -35,6 +36,8 @@ export function writeMidi(tracks, bpm) {
     }
     ev.sort((a, b) => a.tick - b.tick || a.kind - b.kind);   // à temps égal : les fins avant les débuts
     const data = [...vlq(0), 0xff, 0x03, ...vlq(text(tr.name).length), ...text(tr.name)];
+    if (Number.isInteger(tr.bank) && tr.bank > 0) data.push(...vlq(0), 0xb0 | ch, 0, (tr.bank >> 7) & 127, ...vlq(0), 0xb0 | ch, 32, tr.bank & 127);
+    if (Number.isInteger(tr.program)) data.push(...vlq(0), 0xc0 | ch, tr.program & 127);
     let last = 0;
     for (const e of ev) { data.push(...vlq(e.tick - last), ...e.bytes); last = e.tick; }
     data.push(...vlq(0), 0xff, 0x2f, 0);
@@ -44,8 +47,9 @@ export function writeMidi(tracks, bpm) {
 }
 
 /**
+ * prog : son General MIDI de la voie au début de la note (dernier Program Change reçu, -1 sans).
  * @param {ArrayBuffer|Uint8Array} buf
- * @returns {{ bpm: number, tracks: { name: string, notes: { t, len, note, vel, ch }[] }[] }}
+ * @returns {{ bpm: number, tracks: { name: string, notes: { t, len, note, vel, ch, prog }[] }[] }}
  */
 export function readMidi(buf) {
   const b = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
@@ -63,7 +67,7 @@ export function readMidi(buf) {
     if (str(4) !== 'MTrk') break;
     const len = r32(), end = p + len;
     let tick = 0, status = 0, name = '';
-    const open = new Map(), notes = [];
+    const open = new Map(), notes = [], progs = new Array(16).fill(-1);
     while (p < end) {
       tick += rv();
       let st = b[p];
@@ -78,14 +82,15 @@ export function readMidi(buf) {
       status = st;
       const type = st & 0xf0, ch = st & 15;
       const d1 = b[p++], d2 = type === 0xc0 || type === 0xd0 ? 0 : b[p++];
-      if (type === 0x90 && d2 > 0) open.set(ch * 128 + d1, { tick, vel: d2 });
+      if (type === 0xc0) progs[ch] = d1;
+      else if (type === 0x90 && d2 > 0) open.set(ch * 128 + d1, { tick, vel: d2, prog: progs[ch] });
       else if (type === 0x80 || type === 0x90) {
         const o = open.get(ch * 128 + d1);
-        if (o) { notes.push({ t: o.tick / div, len: Math.max(1, tick - o.tick) / div, note: d1, vel: o.vel / 127, ch }); open.delete(ch * 128 + d1); }
+        if (o) { notes.push({ t: o.tick / div, len: Math.max(1, tick - o.tick) / div, note: d1, vel: o.vel / 127, ch, prog: o.prog }); open.delete(ch * 128 + d1); }
       }
     }
     p = end;
-    for (const [key, o] of open) notes.push({ t: o.tick / div, len: Math.max(1, tick - o.tick) / div, note: key % 128, vel: o.vel / 127, ch: Math.floor(key / 128) });
+    for (const [key, o] of open) notes.push({ t: o.tick / div, len: Math.max(1, tick - o.tick) / div, note: key % 128, vel: o.vel / 127, ch: Math.floor(key / 128), prog: o.prog });
     if (notes.length) tracks.push({ name, notes: notes.sort((a, c) => a.t - c.t || a.note - c.note) });
   }
   return { bpm: Math.round(bpm * 100) / 100, tracks };

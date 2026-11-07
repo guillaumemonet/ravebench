@@ -21,6 +21,7 @@ import { bufferCache } from './sounds.js';
 import { growSong, loadTlBuffers, renderTl, tlRec, trackName, trackTouched } from './tl.js';
 import { tlPicked, tlSelect } from './tl-select.js';
 import { closeFxEditor } from './trackfx-ui.js';
+import { midiOutLabel, openMidiOut } from './midi-out-ui.js';
 
 export const frozenCache = new Map();   // empreinte de la piste -> AudioBuffer (son rendu, depuis le temps 0)
 const freezePending = new Map();        // empreinte -> rendu en cours (promesse)
@@ -245,9 +246,10 @@ export function openTrackMenu(i, x, y) {
     item(t('frz.refreeze'), () => refreezeTrack(i), 'reset', t('frz.refreezeTitle'));
   }
   item(t('frz.bounce'), () => bounceTrack(i), 'bounce', t('frz.bounceTitle'));
+  const mout = item(tr.midi ? t('mout.itemOn') : t('mout.item'), () => openMidiOut(i, x, y), 'keys', tr.midi ? midiOutLabel(tr.midi) : t('mout.itemTitle'));
   const ids = !tr.frozen && pickedOn(i);
   if (ids) item(t('frz.bounceSel', { n: ids.size }), () => bounceTrack(i, ids), 'bounce', t('frz.bounceSelTitle'));
-  for (const b of trackMenu.querySelectorAll('.cm-item')) b.disabled = bouncing || !!tlRec;
+  for (const b of trackMenu.querySelectorAll('.cm-item')) b.disabled = b !== mout && (bouncing || !!tlRec);
   document.body.appendChild(trackMenu);
   const w = trackMenu.offsetWidth, h = trackMenu.offsetHeight;
   trackMenu.style.left = `${Math.max(8, Math.min(window.innerWidth - w - 8, x))}px`;

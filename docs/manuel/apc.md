@@ -80,12 +80,21 @@ Les associations sont enregistrées avec le projet, sous le nom de chaque appare
 
 L'APC Key 25 n'est pas le seul appareil possible : **n'importe quel clavier ou contrôleur MIDI** branché en USB (sans pilote pour la plupart) est reconnu, en même temps que l'APC. La fenêtre **MIDI** (barre des plugins, groupe Système) les liste.
 
-- **Ses touches** jouent le synthé de la fenêtre active, comme le clavier de l'APC (accords, arpégiateur, enregistrement dans la timeline compris) ; **sa pédale de sustain** tient les notes.
+- **Ses touches** jouent le synthé de la fenêtre active, comme le clavier de l'APC (accords, arpégiateur, enregistrement dans la timeline compris) ; **sa pédale de sustain** tient les notes. Les claviers de 25 à 88 touches sont reconnus (le nombre de touches est lu dans le nom de l'appareil, ou réglé dans la liste des appareils branchés).
+- **Changer de son depuis le clavier** : les boutons de son ou de programme d'un clavier (Program Change, avec sa sélection de banque) choisissent un preset de l'instrument que joue l'appareil, dans l'ordre de son menu de presets (ceux tout prêts par catégorie, puis les vôtres ★) : programme 1 = le premier son, programme 2 = le deuxième… Avec la sélection de banque, chaque banque ajoute 128. Un appareil qui joue les pads change la banque affichée ; un appareil qui suit la fenêtre active change le son de l'instrument de la page active. Un message indique le son choisi.
 - **MIDI learn** : dans la fenêtre MIDI, cliquez sur **Apprendre** à côté d'une cible, puis tournez un potentiomètre, bougez un fader ou appuyez sur un bouton de l'appareil. Échap annule ; la corbeille retire une assignation.
 - **Cibles** : les potentiomètres **K1 à K8 de la page active** (exactement comme ceux de l'APC : synthé, effets, pads, mixeur…), les **faders du mixeur**, le **volume général**, les **volumes des bus**, et le transport : **lecture / arrêt**, **arrêt**, **enregistrer**, **boucle**.
 - Une commande ne pilote qu'une cible (la réassigner la retire de l'ancienne). Une touche ou un pad assigné à un bouton ne joue plus de note.
 - **Horloge MIDI** : **Envoyer vers** un appareil (boîte à rythmes, séquenceur, autre logiciel) : il reçoit l'horloge (24 impulsions par temps), Start, Stop et la position, et suit la timeline même quand on saute à un marqueur. **Suivre** un appareil : Ravebench prend son tempo et démarre / s'arrête avec lui.
 - Les assignations sont enregistrées avec le projet. En bas de la fenêtre, le **moniteur** affiche les derniers messages reçus de chaque appareil.
+
+## Instruments MIDI externes
+
+Une piste de la timeline peut jouer un **instrument MIDI** au lieu des sons de Ravebench : synthé matériel, groovebox, piano numérique ou module de sons, ou un autre logiciel par un câble MIDI virtuel.
+
+- Clic droit sur l'en-tête de la piste › **Instrument MIDI externe…** : choisissez l'**instrument** (les sorties MIDI branchées), sa **voie** (1 à 16) et son **son** : les 128 sons du jeu **General MIDI**, par famille (Piano, Organ, Bass, Strings, Synth Lead, Synth Pad…), compris par la plupart des pianos numériques, claviers et modules de sons ; **Banque** (MSB / LSB) donne accès aux autres banques de sons de l'instrument (voir son manuel). **Note d'essai** joue un do pour l'entendre.
+- Les **blocs de notes** de la piste jouent alors sur l'instrument (les blocs audio et les coups de pads de la piste restent joués par Ravebench). Son son part au début de la lecture et dès que vous le changez ; les notes partent à l'heure, calées sur ce que vous entendez ; Arrêt relâche toutes les notes. Un badge **MIDI** signale la piste (clic dessus pour changer les réglages). Une piste muette n'envoie rien.
+- Le son de l'instrument ne revient pas tout seul dans Ravebench : pour l'entendre dans le mixage, l'exporter ou le geler, branchez sa sortie audio sur la carte son et enregistrez-la sur une piste (voir Entrée audio dans [Fichiers](fichiers.md)). Les réglages sont enregistrés avec le projet ; un instrument débranché est gardé et revient quand il est rebranché.
 
 ---
 

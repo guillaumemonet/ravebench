@@ -27,6 +27,8 @@ import { DRUM_DEFS, renderTr } from './drum-ui.js';
 //         user(): [{ id, cat, name, … }] (la liste de l'état), current(): id | null, apply(id), save(name, cat) -> id,
 //         remove(id), refresh?() (après un changement de nom ou un import : menus qui listent vos presets) }
 export const presetBars = {};   // outil -> barre (import d'un fichier de preset)
+// Presets d'une barre dans l'ordre de son menu (par catégorie : ceux fournis, puis les vôtres) : changement de son MIDI.
+export const presetOrder = cfg => cfg.cats.flatMap(c => [...cfg.builtins.filter(p => p.cat === c), ...cfg.user().filter(p => p.cat === c)]);
 let menu = null;
 function closeMenu() { menu?.remove(); menu = null; window.removeEventListener('pointerdown', outside, true); }
 const outside = e => { if (menu && !menu.contains(e.target)) closeMenu(); };
