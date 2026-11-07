@@ -1,5 +1,6 @@
 // Fenêtre de la TB-303.
-import { ACID_BASE, ACID_PARAMS, ACID_PATTERNS, ACID_ROWS, acidFmt, acidSteps, defaultAcidState, randomPattern } from '../acid.js';
+import { ACID_BASE, ACID_PARAMS, ACID_PATTERNS, ACID_ROWS, acidFmt, acidSteps, defaultAcidState } from '../acid.js';
+import { acidLine } from '../patterngen.js';
 import { t } from '../i18n.js';
 import { $, acid, drum, state, timeline, wm } from './core.js';
 import { arcPath } from './knobs.js';
@@ -28,7 +29,7 @@ export function buildAcid() {
   $('#acid-link').addEventListener('click', () => { state.acid.link = !state.acid.link; if (!state.acid.link) acid.clockStopped(); renderAcid(); save(); });
   $('#acid-rec').addEventListener('click', () => { acidStepRec = !acidStepRec; acidCursor = 0; renderAcid(); });
   $('#acid-rest').addEventListener('click', () => acidWrite(null));
-  $('#acid-random').addEventListener('click', () => { state.acid.patterns[state.acid.pattern] = randomPattern(); renderAcid(); save(); });
+  $('#acid-random').addEventListener('click', () => { state.acid.patterns[state.acid.pattern] = acidLine(); renderAcid(); save(); });
   $('#acid-clear').addEventListener('click', () => {
     state.acid.patterns[state.acid.pattern] = acidPattern().map(() => ({ note: 0, gate: false, acc: false, slide: false, oct: 0 }));
     renderAcid();

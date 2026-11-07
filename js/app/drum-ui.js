@@ -1,6 +1,7 @@
 // Fenêtres des boîtes à rythmes (TR-909, TR-808) et grille de l'APC en mode boîte à rythmes. Les deux fenêtres sont
 // construites par le même code : `id` = 'tr' (909) ou 'tr8' (808), les éléments de la page sont `#<id>-…`.
 import { t } from '../i18n.js';
+import { drumGroove } from '../patterngen.js';
 import { PATTERNS } from '../drummachine.js';
 import { TR8_DEF } from '../tr808.js';
 import { TR_DEF } from '../tr909.js';
@@ -153,6 +154,14 @@ export function buildDrum(id) {
   win.addEventListener('pointerdown', () => setTrTarget(id));   // la grille de l'APC pilote la machine qu'on utilise
   $(`#${id}-play`).addEventListener('click', () => toggleDrum(id));
   $(`#${id}-apc`).addEventListener('click', () => toggleTrMode(!(trMode && trTarget === id), id));
+  // Aléatoire : un groove du genre dans le pattern affiché (js/patterngen.js).
+  $(`#${id}-random`).addEventListener('click', () => {
+    const st = state[id];
+    st.patterns[st.pattern] = { ...DRUM_DEFS[id].emptyPattern(), ...drumGroove(id, drumInstruments(id).map(i => i.id)) };
+    renderTr();
+    renderLeds();
+    save();
+  });
   $(`#${id}-accent`).addEventListener('input', e => { state[id].globals.accent = e.target.value / 100; save(); });
   buildPatternButtons($(`#${id}-patterns`), k => drumOf(id).selectPattern(k));
   const grid = $(`#${id}-grid`);

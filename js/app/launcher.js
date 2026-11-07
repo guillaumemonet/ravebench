@@ -28,6 +28,7 @@ export function cleanLauncher(saved) {
 
 export let launcherMode = false;          // grille de l'APC = lanceur
 const players = new Map();                // colonne -> { tl, row }
+export const launcherPlaying = () => players.size > 0;
 const pending = new Map();                // colonne -> { row (null = arrêt), at, timer }
 let origin = null;                        // grille des mesures du lanceur quand rien d'autre ne joue
 const slot = (r, c) => state.launcher.slots[r]?.[c] ?? null;

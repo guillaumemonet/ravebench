@@ -440,6 +440,10 @@ footer { padding: 4px 20px 8px; }
 .apc-live { position: relative; outline: 2px dashed color-mix(in srgb, var(--accent-2) 80%, transparent); outline-offset: 4px; border-radius: 6px; }
 .apc-live::after { content: 'APC K1-K8'; position: absolute; top: -12px; right: 4px; padding: 0 5px; font-size: 9px; font-weight: 700; letter-spacing: .05em; color: #000; background: var(--accent-2); border-radius: 4px; }
 .plugins button.active { background: var(--accent-2); border-color: var(--accent-2); color: #000; font-weight: 600; }
+/* Instrument qui joue, fenêtre fermée : le bouton clignote doucement. */
+.plugins button.running { animation: plugin-running 1s ease-in-out infinite; border-color: var(--accent); }
+@keyframes plugin-running { 0%, 100% { background: var(--panel); box-shadow: none; } 50% { background: color-mix(in srgb, var(--accent) 55%, var(--panel)); box-shadow: 0 0 8px var(--accent); } }
+@media (prefers-reduced-motion: reduce) { .plugins button.running { animation: none; background: color-mix(in srgb, var(--accent) 40%, var(--panel)); } }
 main.app { flex: 1; min-height: 0; display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 12px; padding: 12px 16px; max-width: none; margin: 0; }
 .library, .tl-area { display: flex; flex-direction: column; min-height: 0; padding: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
 

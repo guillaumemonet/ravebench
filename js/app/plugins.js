@@ -2,7 +2,8 @@
 import { DECK_IDS } from '../decks.js';
 import { t } from '../i18n.js';
 import { WINDOWS } from '../windows.js';
-import { $, viz, wm } from './core.js';
+import { $, acid, decks, drum, drum808, playing, stepSeq, viz, wm } from './core.js';
+import { launcherPlaying } from './launcher.js';
 import { curvePreviewStop, renderCurveCanvas } from './curve-ui.js';
 import { inputWinOpened } from './audio-input.js';
 import { renderBreizh, renderBreizhRoll, stopBreizhPreview } from './breizh-ui.js';
@@ -56,7 +57,26 @@ export function buildPluginBar() {
 
 export function renderPluginBar() {
   for (const btn of $('#plugins').querySelectorAll('button[data-plugin]')) btn.classList.toggle('active', wm.isOpen(btn.dataset.plugin));
+  renderRunning();
 }
+
+// Un instrument qui joue alors que sa fenêtre est fermée : son bouton clignote (on le retrouve pour l'arrêter).
+const RUNNING = {
+  tr: () => drum?.running, tr8: () => drum808?.running, acid: () => acid?.playing, seq: () => stepSeq?.running,
+  decks: () => decks?.playing, pads: () => playing.size > 0, launcher: () => launcherPlaying(),
+};
+export const instrumentRunning = id => !!RUNNING[id]?.();
+function renderRunning() {
+  for (const btn of $('#plugins').querySelectorAll('button[data-plugin]')) {
+    const id = btn.dataset.plugin;
+    const on = !!RUNNING[id] && !wm.isOpen(id) && instrumentRunning(id);
+    if (btn.classList.contains('running') !== on) {
+      btn.classList.toggle('running', on);
+      btn.title = on ? t('plugins.running', { name: t(`win.${id}`) }) : '';
+    }
+  }
+}
+setInterval(() => { if ($('#plugins') && wm) renderRunning(); }, 250);
 
 export function onWindowToggle(id, open) {
   renderPluginBar();

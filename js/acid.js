@@ -120,23 +120,6 @@ export function mergeAcidState(saved) {
   return base;
 }
 
-// Ligne acid au hasard en fa mineur (gamme + quelques octaves, accents et glissés).
-export function randomPattern() {
-  const scale = [0, 3, 5, 7, 8, 10, 12];
-  return Array.from({ length: 16 }, (_, s) => {
-    const gate = s % 4 === 0 || Math.random() < 0.7;
-    if (!gate) return rest();
-    const r = Math.random();
-    return {
-      note: r < 0.4 ? 0 : scale[Math.floor(Math.random() * scale.length)],
-      gate: true,
-      acc: Math.random() < 0.3,
-      slide: Math.random() < 0.22,
-      oct: Math.random() < 0.15 ? 1 : Math.random() < 0.08 ? -1 : 0,
-    };
-  });
-}
-
 const midiToFreq = n => 440 * Math.pow(2, (n - 69) / 12);
 
 export class Acid303 {

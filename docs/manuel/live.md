@@ -73,6 +73,7 @@ La barre sous l'en-tête ouvre et ferme les plugins, en quatre groupes : **Instr
 - **Déplacez**-la par sa barre de titre, **redimensionnez**-la par son coin en bas à droite ; elle **s'aimante** aux bords de l'écran et aux autres fenêtres.
 - **?** ouvre l'**aide** du contenu de la fenêtre, à côté d'elle (**?** à nouveau, ✕ ou Échap la ferme).
 - **✕** la ferme ; les fenêtres utilisées sont mémorisées avec leur position.
+- Un instrument qui continue de jouer alors que sa fenêtre est fermée (TR-909, TR-808, TB-303, séquenceur pas à pas, platines, pads, lanceur) fait **clignoter son bouton** dans la barre : un clic rouvre sa fenêtre.
 - Les outils dont on peut enregistrer les réglages (instruments, générateurs, designers, mixeur, câblage, scènes, platines, lanceur, bus, visualiseur, MIDI ; la banque pour Pads et Banques) ont aussi des boutons **⤒ Importer / ⤓ Exporter** dans leur barre de titre (voir [Fichiers](fichiers.md)).
 - Le bouton **Réorganiser les fenêtres** (quatre carrés, dans l'en-tête) les remet à leur place et à leur taille de départ.
 
