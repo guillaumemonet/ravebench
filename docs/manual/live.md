@@ -43,7 +43,7 @@ Play the song live, clip by clip, like on stage. The **Launcher** window (plugin
 - the synth preset, the tempo, and whether the transport is playing.
 
 - **Launch**: click a scene. Everything switches **on the next bar**: new loops start, the others stop, patterns change and the mixer follows.
-- **Save** the current state: Shift + click, or turn on **Save mode**. Right-click clears a scene.
+- **Store** the current state: Shift + click, or turn on **Store mode**. Right-click clears a scene.
 - **APC**: **Shift + STOP ALL CLIPS** turns the pad grid into the 40 scenes. Pad = launch, Shift + pad = save, Shift + STOP ALL CLIPS again (or a SCENE LAUNCH button) to exit. LEDs: green = stored, red = current, blinking = waiting for the next bar.
 
 ## Visualizer
@@ -73,7 +73,7 @@ The bar under the header opens and closes the plugins, in four groups: **Instrum
 - **Move** it by its title bar, **resize** it by its bottom-right corner; it **snaps** to the screen edges and to the other windows.
 - **?** opens the **help** for the window's content, next to it (**?** again, ✕ or Esc closes it).
 - **✕** closes it; the windows you use are remembered with their position.
-- The tools whose settings can be saved (instruments, generators, designers, mixer, patch, scenes, decks, launcher, buses, visualizer, MIDI; the bank for Pads and Banks) also have **📁 / 💾** buttons in their title bar (see Saving and opening).
+- The tools whose settings can be saved (instruments, generators, designers, mixer, patch, scenes, decks, launcher, buses, visualizer, MIDI; the bank for Pads and Banks) also have **⤒ Import / ⤓ Export** buttons in their title bar (see [Files](files.md)).
 - The **Reset windows** button (four squares, in the header) puts them back in their default place and size.
 
 ---

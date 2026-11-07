@@ -43,7 +43,7 @@ Jouez le morceau en direct, clip par clip, comme sur scène. La fenêtre **Lance
 - le preset du synthé, le tempo, et l'état lecture ou arrêt.
 
 - **Lancer** : clic sur une scène. Tout bascule **à la mesure suivante** : les nouvelles boucles démarrent, les autres s'arrêtent, les patterns changent et le mixeur suit.
-- **Enregistrer** l'état actuel : Maj + clic, ou activez le **Mode enregistrement**. Un clic droit efface une scène.
+- **Mémoriser** l'état actuel : Maj + clic, ou activez le **Mode mémorisation**. Un clic droit efface une scène.
 - **APC** : **Maj + STOP ALL CLIPS** transforme la grille de pads en 40 scènes. Pad = lancer, Maj + pad = enregistrer, Maj + STOP ALL CLIPS à nouveau (ou un bouton SCENE LAUNCH) pour revenir. LEDs : vert = enregistrée, rouge = en cours, clignotant = en attente de la mesure suivante.
 
 ## Visualiseur
@@ -73,7 +73,7 @@ La barre sous l'en-tête ouvre et ferme les plugins, en quatre groupes : **Instr
 - **Déplacez**-la par sa barre de titre, **redimensionnez**-la par son coin en bas à droite ; elle **s'aimante** aux bords de l'écran et aux autres fenêtres.
 - **?** ouvre l'**aide** du contenu de la fenêtre, à côté d'elle (**?** à nouveau, ✕ ou Échap la ferme).
 - **✕** la ferme ; les fenêtres utilisées sont mémorisées avec leur position.
-- Les outils dont on peut enregistrer les réglages (instruments, générateurs, designers, mixeur, câblage, scènes, platines, lanceur, bus, visualiseur, MIDI ; la banque pour Pads et Banques) ont aussi des boutons **📁 / 💾** dans leur barre de titre (voir Enregistrer et ouvrir).
+- Les outils dont on peut enregistrer les réglages (instruments, générateurs, designers, mixeur, câblage, scènes, platines, lanceur, bus, visualiseur, MIDI ; la banque pour Pads et Banques) ont aussi des boutons **⤒ Importer / ⤓ Exporter** dans leur barre de titre (voir [Fichiers](fichiers.md)).
 - Le bouton **Réorganiser les fenêtres** (quatre carrés, dans l'en-tête) les remet à leur place et à leur taille de départ.
 
 ---

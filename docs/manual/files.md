@@ -6,11 +6,13 @@ Saving and opening projects, songs and settings; WAV and stems export; kits.
 
 ## Saving and opening
 
-Ravebench saves everything automatically in the browser, and you can also keep your work in **`.ravebench` files** (files saved before the change of name, `.gabber`, still open; to back it up, move it to another computer or share it):
+Ravebench saves everything automatically in the browser, and you can also keep your work in **`.ravebench` files** (files saved before the change of name, `.gabber`, and old `.apckit` bank files still open; to back it up, move it to another computer or share it). One icon, one meaning: 💾 / 📁 for the **project** (header), ⤓ **Export** / ⤒ **Import** for a file (song, settings of a tool, bank, preset), ★ **Keep** for your presets, **→ Library** for your sounds and curves:
 - **Save project** (header): the whole project in one file: timeline, tempo, pads and banks, every tool, mixer, patch, scenes, windows, with your own sounds and recordings inside. **Open…** loads it back (everything is replaced, then the app restarts on it).
-- **Song** (the 📁 / 💾 buttons of the timeline toolbar): the timeline alone (tracks, blocks, track effects, length, tempo) with the recordings it uses. Opening a song replaces the timeline (Ctrl+Z brings the previous one back).
-- **Settings of a tool**: the 📁 / 💾 buttons in the title bar of the TR-909 (patterns and knobs), TB-303, Synth, Oscillator synth (with your presets), Kick designer, Mixer (with the sidechain and the master section), Patch, Scenes, Generator, Breizh generator, Build-up designer, Voice generator, Pitch correction, Effect designer (your curves), Decks (with their sounds), Launcher, Buses, Visualizer and MIDI (learned controls, devices, clock). In the **Pads** and **Banks** windows, 📁 / 💾 open and save the bank (`.apckit` file, see below).
-- Any **Open** button accepts any Ravebench file: it recognises what it contains and loads it where it belongs. Library sounds are referenced by name; imported sounds and recordings are embedded.
+- **Song** (the ⤒ / ⤓ buttons of the timeline toolbar): the timeline alone (tracks, blocks, track effects, length, tempo) with the recordings it uses. Importing a song replaces the timeline (Ctrl+Z brings the previous one back).
+- **Settings of a tool**: the ⤒ **Import** / ⤓ **Export** buttons in the title bar of the TR-909 (patterns and knobs), TB-303, Synth, Oscillator synth, Kick designer, Mixer (with the sidechain and the master section), Patch, Scenes, Generator, Breizh generator, Build-up designer, Voice generator, Pitch correction, Effect designer (your curves), Decks (with their sounds), Launcher, Buses, Visualizer and MIDI (learned controls, devices, clock). In the **Pads** and **Banks** windows they import and export the bank.
+- **Your presets** (★): every preset bar has **Keep** (the current settings become a preset of yours) and the **⋯** menu of the chosen preset: **Name** (rename), **Duplicate**, **Export to a file…**, **Import a preset…**, **Delete**. The same menu everywhere: instruments, kick designer, generators.
+- **What is yours stays yours**: your presets (★), curves and sounds (designer kicks, imported sounds) are kept apart in the browser. Opening a project, a tool file or **Reset** does not erase them: they join those of the opened file. An exported project carries them too, to find them on another computer.
+- Any **Open** or **Import** button accepts any Ravebench file: it recognises what it contains (project, song, tool, bank, preset) and loads it where it belongs. Library sounds are referenced by name; imported sounds and recordings are embedded.
 
 ## Recording and kits
 
@@ -18,7 +20,7 @@ Ravebench saves everything automatically in the browser, and you can also keep y
 - **⤓ Stems** exports each non-empty track as its own full-length WAV file, all in one ZIP archive, ready to be mixed in another program. Stems come out **without the master chain** (no compressor, no limiter): that is up to the final mix.
 - When a WAV export ends, the message gives the file's **integrated loudness** (in LUFS) and its **peak**; they stay on display in the mixer's master chain.
 - **● REC** in the header records the master output live, including what you play and the performance effects. Press it again to download a WAV file.
-- 💾 (title bar of the **Pads** and **Banks** windows) saves the bank, **Export all** (Banks window) the whole session, in a self-contained `.apckit` file with the sounds and settings. 📁 loads it back: a bank goes into the displayed bank, and a session replaces everything.
+- **Banks**: ⤓ in the title bar of the **Pads** and **Banks** windows exports the bank, **Export all** (Banks window) all the banks, in a `.ravebench` file with their pads and imported sounds. ⤒ imports it: a bank goes into the displayed bank, a file of all the banks replaces them all. The instrument settings travel with the project.
 
 Your banks, sounds and settings are saved automatically in the browser.
 

@@ -745,6 +745,8 @@ header button, header .status { white-space: nowrap; }
 .preset-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 10px; }
 .preset-bar .pb-sel { min-width: 210px; }
 .preset-bar .pb-name { width: 150px; }
+.preset-bar .pb-more { min-width: 32px; padding-left: 8px; padding-right: 8px; font-weight: 700; letter-spacing: .05em; }
+.cm-item:disabled { opacity: .4; cursor: default; background: transparent; }
 
 /* Piano roll */
 .roll-area .win-body { display: flex; flex-direction: column; overflow: hidden; }

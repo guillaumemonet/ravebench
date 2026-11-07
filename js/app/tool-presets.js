@@ -25,6 +25,7 @@ export function buildToolPresets() {
     if (!wrap) continue;
     const list = () => state.toolPresets[kind];
     toolPresetBars[kind] = presetBar(wrap, {
+      kind,
       cats: ['mine'],
       catLabel: () => t('pb.mine'),
       builtins: [],

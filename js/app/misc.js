@@ -4,7 +4,8 @@ import * as store from '../storage.js';
 import { panic } from './actions.js';
 import { renderLeds } from './controller.js';
 import { everyFrame } from '../ticker.js';
-import { $, engine } from './core.js';
+import { $, engine, state } from './core.js';
+import { mySnapshot } from './mine.js';
 import { levelMeter, peakOf } from './meters.js';
 import { renderKnobs, renderPages } from './knobs.js';
 import { renderBanks, renderEditor, renderPads } from './pads.js';
@@ -46,6 +47,8 @@ export function renderAll() {
 $('#panic').addEventListener('click', () => engine && panic());
 $('#reset').addEventListener('click', async () => {
   if (!confirm(t('reset.confirm'))) return;
-  await store.clearAll();
+  // Vos presets, courbes et sons restent (js/app/mine.js) ; le reste repart du kit de départ.
+  await store.saveMine(mySnapshot());
+  await store.clearProject(state.userSounds.map(s => s.sampleId));
   location.reload();
 });

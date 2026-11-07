@@ -9,8 +9,9 @@ export const FILE_FORMAT = 'ravebench-file';
 export const FILE_EXT = '.ravebench';
 const OLD_FORMATS = ['gabberkey-file'];   // GabberKey, l'ancien nom
 // Contenus possibles : projet, morceau, et un par outil.
+// Plus : une banque de pads (bank), toutes les banques (banks), un de vos presets (preset).
 export const FILE_KINDS = ['project', 'song', 'tr', 'tr8', 'seq', 'slicer', 'acid', 'osc', 'piano', 'kick', 'mix', 'patch', 'scenes',
-  'gen', 'breizh', 'buildup', 'voice', 'tune', 'curve', 'decks', 'launcher', 'buses', 'viz', 'monitor'];
+  'gen', 'breizh', 'buildup', 'voice', 'tune', 'curve', 'decks', 'launcher', 'buses', 'viz', 'monitor', 'bank', 'banks', 'preset'];
 
 const toDataUrl = bytes => new Promise((resolve, reject) => {
   const r = new FileReader();

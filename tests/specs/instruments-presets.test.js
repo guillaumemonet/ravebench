@@ -23,7 +23,7 @@ export default async function (t, A) {
     sel.value = builtins[0].value; sel.dispatchEvent(new Event('change'));
     sel.value = saved; sel.dispatchEvent(new Event('change'));
     t.eq(sel.value, saved, `${id} : preset perso rechargé`);
-    b.querySelector('.pb-del').click();
+    b.querySelector('.pb-more').click(); t.$('.pb-menu .cm-item[data-icon="trash"]').click();
     t.ok(!sel.value.startsWith('u:'), `${id} : supprimé`, sel.value);
   };
   A.wm.toggle('tr', true);

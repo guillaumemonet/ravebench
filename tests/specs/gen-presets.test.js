@@ -29,7 +29,7 @@ export default async function (t, A) {
   t.ok(/16/.test(t.$('#buildup select[data-key="bars"]').value), 'la fenêtre affiche les réglages rappelés');
   t.eq(JSON.parse(JSON.stringify(A.stateSnapshot().toolPresets)).buildup[0].name, 'Montée longue', 'enregistré avec le projet');
   t.eq(A.cleanToolPresets({ buildup: [{ id: 'x' }], gen: 'n' }).buildup, [], 'presets invalides écartés');
-  wrap.querySelector('.pb-del').click();
+  wrap.querySelector('.pb-more').click(); t.$('.pb-menu .cm-item[data-icon="trash"]').click();
   t.eq(S.toolPresets.buildup.length, 0, 'corbeille : supprimé');
   A.wm.toggle('buildup', false);
   // Boutons : Écouter en gris, l'action principale en orange.

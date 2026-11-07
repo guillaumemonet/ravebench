@@ -27,6 +27,7 @@ import { cleanDevices } from './devices.js';
 import { cleanBankNames } from './banks-ui.js';
 import { mergeBuildup } from '../buildup.js';
 import { cleanToolPresets } from './tool-presets.js';
+import { mySnapshot, restoreMine } from './mine.js';
 import { mergeVoiceState } from './voice-ui.js';
 import { mergeTuneState } from './tune-ui.js';
 import { defaultGen, mergeGen } from './gen.js';
@@ -114,6 +115,7 @@ export async function restore() {
       }
     }
   }
+  await restoreMine();   // vos presets, courbes et sons, gardés à part du projet
   const added = await importLibrary();
   refreshLibNames();
   setLibAdded(firstRun ? [] : added);   // au premier lancement, tout est nouveau : pas de message
@@ -236,6 +238,7 @@ export function save() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     store.saveState(stateSnapshot()).catch(err => console.warn('Save failed', err));
+    store.saveMine(mySnapshot()).catch(err => console.warn('Save failed', err));
   }, 400);
 }
 

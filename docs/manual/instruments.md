@@ -18,7 +18,7 @@ A Roland TR-909 emulation with its 11 instruments (bass drum, snare, 3 toms, rim
 
 Every instrument has its own distortion. The bass drum starts with a "Tube" drive for the gabber sound. The accent amount is set with the slider on screen.
 
-**Sound kits** (menu above the grid): the settings of the 11 instruments at once, distortion included: **Hardcore** (Gabber, Rotterdam, Early hardcore, Doef, Clipped, Terror, Industrial), **Classic** (Clean 909, House, Techno) and **FX** (Lo-fi crush, Folded). Turning a knob makes the sound custom; type a name, choose a category and **Save** to keep your own (★ in the menu), the bin deletes it. The patterns are not part of a kit.
+**Sound kits** (menu above the grid): the settings of the 11 instruments at once, distortion included: **Hardcore** (Gabber, Rotterdam, Early hardcore, Doef, Clipped, Terror, Industrial), **Classic** (Clean 909, House, Techno) and **FX** (Lo-fi crush, Folded). Turning a knob makes the sound custom; type a name, choose a category and **Keep** to keep your own (★ in the menu); the **⋯** menu renames, duplicates, exports or deletes it (see [Files](files.md)). The patterns are not part of a kit.
 
 **Sequencer**: 16 steps, 8 patterns, 4 of them preset (gabber, rave, breakbeat, kick roll). It runs on the same tempo and bar grid as the loops, so it stays in sync with them. A pattern change waits for the next bar. On screen, click a step to cycle note → accent → off, and click an instrument name to play and select it.
 
@@ -61,7 +61,7 @@ A sequencer for **any pad sound**: one row per pad (from any bank), 16, 32 or 64
 - **Steps 16 / 32 / 64** (1, 2 or 4 bars): lengthening a pattern repeats what is written; the **Bar 1-4** buttons show each part.
 - **Put on the timeline**: the pattern becomes pad blocks, one track per row (first free tracks from the armed track), from the playhead bar, repeated 1 to 8 times (**Repeat**). Each block stops at the next hit of the same pad.
 - **Record by playing**: choose the **Step sequencer** source on an armed track; it starts with the recording and its hits become pad blocks, with their velocity.
-- **Scenes** remember its pattern and whether it plays; its patterns are undone with Ctrl+Z and saved to a file (📁 / 💾).
+- **Scenes** remember its pattern and whether it plays; its patterns are undone with Ctrl+Z and exported to a file (⤒ / ⤓).
 - The [break slicer](pads.md#break-slicer) fills a pattern with the hits of a break.
 
 ## TB-303
@@ -71,7 +71,7 @@ A sequencer for **any pad sound**: one row per pad (from any bank), 16, 32 or 64
 An acid bass line in the style of the Roland TB-303, synthesised live: oscillator (saw or square), resonant 24 dB low-pass filter driven by an envelope, accent, slide, then distortion with the 909's 5 shapes.
 
 - **Grid**: 16 steps (16th notes) × one octave from F to high F. Click a cell to place a note, again for a rest. The **Oct + / Oct −** rows shift a step by an octave, **Accent** makes it louder with a snappier filter, **Slide** glides into the next note without retriggering the envelope (the famous "squelch").
-- **Sound presets**: 18 ready-made sounds in 4 categories: **Acid** (classic, squelch, screamer, Rotterdam, early acid, hoover), **Bass** (rubber, sub, dark roller, doef bass), **Lead** (saw lead, squeal, gabber lead, alarm) and **FX** (laser, siren, crushed, zap). Turning a knob makes the sound custom; give it a name and a category and **Save** it to keep your own presets (★), saved with the session and in the TB-303 settings files.
+- **Sound presets**: 18 ready-made sounds in 4 categories: **Acid** (classic, squelch, screamer, Rotterdam, early acid, hoover), **Bass** (rubber, sub, dark roller, doef bass), **Lead** (saw lead, squeal, gabber lead, alarm) and **FX** (laser, siren, crushed, zap). Turning a knob makes the sound custom; give it a name and a category and **Keep** it to keep your own presets (★); they stay yours, and the **⋯** menu renames, duplicates, exports or deletes them.
 - **Knobs**: tune, cutoff, resonance, envelope amount, decay, accent, **slide** (glide time between linked notes), drive, shape, volume. On the APC, **Shift + REC** opens the TB-303 knob page (K1 cutoff … K8 volume).
 - **8 patterns**, 4 of them ready-made in F minor (acid gabber, rolling 16ths, squelchy slides, minimal offbeat). A pattern change waits for the next bar. **Random** writes a new acid line in F minor; **Clear** empties the pattern.
 - **Follow 909** (on by default): the 303 plays on the TR-909's clock, shuffle included, and ▶ starts both. Turn it off to play the 303 on its own, on the loops' bar grid.
@@ -106,7 +106,7 @@ The keyboard plays a layered synth built for hardcore: every preset stacks up to
 
 Double-click a knob in the Synth window to go back to the preset's value.
 
-**Your presets**: the menu under the presets lists them all by family. Turning a knob makes the sound custom; type a name, choose a category and **Save** to keep your own (★ in the menu), the bin deletes it. A preset of yours keeps its starting sound and your 8 knobs.
+**Your presets**: the menu under the presets lists them all by family. Turning a knob makes the sound custom; type a name, choose a category and **Keep** to keep your own (★ in the menu); the **⋯** menu renames, duplicates, exports or deletes it (see [Files](files.md)). A preset of yours keeps its starting sound and your 8 knobs.
 
 ### Chords and arpeggiator
 
@@ -131,7 +131,7 @@ An analogue-style synth to build your own sounds, next to the layered synth.
 - **Two ADSR envelopes** (filter and volume), drawn above their knobs.
 - **Tempo-synced LFO**: sine, triangle, saw or square, from 1/1 to 1/32 with triplets, on the pitch, the filter, the pulse width or the volume.
 - **Voice**: polyphonic (8 notes), mono or legato (no new attack between linked notes), glide, stereo width, volume.
-- **15 presets**: hoover, FM screech, reese, gabber lead, acid bass, sub, supersaw, pluck, brass stab, pad, wobble, laser, early hoover, mentasm stab, alarm, as buttons and in a menu by category (**Lead**, **Bass**, **Pad**, **FX**). Turning a knob makes the sound custom; type a name, choose a category and **Save** to keep your own (★ in the menu), the bin deletes it.
+- **15 presets**: hoover, FM screech, reese, gabber lead, acid bass, sub, supersaw, pluck, brass stab, pad, wobble, laser, early hoover, mentasm stab, alarm, as buttons and in a menu by category (**Lead**, **Bass**, **Pad**, **FX**). Turning a knob makes the sound custom; type a name, choose a category and **Keep** to keep your own (★ in the menu); the **⋯** menu renames, duplicates, exports or deletes it (see [Files](files.md)).
 - **APC knobs**: K1-K8 = cutoff, resonance, filter envelope, filter decay, drive, LFO depth, release, volume (marked on screen) while the window is active.
 - It has its own **mixer channel** (K7 on the mixer pages), is wired in the **Patch** window and ducked by the **sidechain** like the synth. What you record on it becomes a note block with its sound, and in the **piano roll** any note block can use one of its presets.
 
@@ -141,7 +141,7 @@ An analogue-style synth to build your own sounds, next to the layered synth.
 
 Build your own gabber / hardcore kick, computed by the browser in a few milliseconds. In **Simple** mode, 12 knobs:
 
-- **Presets**: Rotterdam, Mainstream, Uptempo, Raw, Terror, Industrial, Early, Frenchcore, 909, Hall, Doef, Clipped 909 (buttons; the last three in the style of the mid-90s Rotterdam parties: a 909 pushed into distortion with a long booming tail, tuned to A#1, D#2 and F2), also in a menu by category (Gabber, Hardcore, Mainstream / uptempo) with your own kicks. Turning a knob makes the sound custom; type a name, choose a category and **Save** to keep your own (★ in the menu), the bin deletes it.
+- **Presets**: Rotterdam, Mainstream, Uptempo, Raw, Terror, Industrial, Early, Frenchcore, 909, Hall, Doef, Clipped 909 (buttons; the last three in the style of the mid-90s Rotterdam parties: a 909 pushed into distortion with a long booming tail, tuned to A#1, D#2 and F2), also in a menu by category (Gabber, Hardcore, Mainstream / uptempo) with your own kicks. Turning a knob makes the sound custom; type a name, choose a category and **Keep** to keep your own (★ in the menu); the **⋯** menu renames, duplicates, exports or deletes it (see [Files](files.md)).
 - **Direction** (next to Simple / Expert): **Normal**, **Reversed** (the whole kick backwards: it swells and ends on the attack) or **Reverse tail** (the hardstyle reverse kick: the tail backwards rising into the punch of the kick, to put on the offbeat). The direction is saved with the kick (your ★ kicks, kick melodies).
 - **Tail**: **Tune** (note of the tail, in tune with the banks), **Punch** and **Sweep** (how high the pitch starts and how fast it drops), **Tail drop** (how far it keeps falling), **Length**, **Zaag** (sawtooth for the raw, buzzing tail of uptempo kicks).
 - **Distortion**: **Drive** and **Shape** (the 909's 5 shapes), then **Formant** and **Bite**, which make the tail "talk".

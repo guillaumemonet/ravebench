@@ -5,7 +5,7 @@ import { cleanCurve } from '../curves.js';
 import { DECK_IDS } from '../decks.js';
 import { t } from '../i18n.js';
 import { mergeKickState } from '../kickdesign.js';
-import { packBanks, unpack } from '../kits.js';
+import { unpack } from '../kits.js';
 import { LIB_CATS } from '../library.js';
 import { CHANNELS, mergeMixState } from '../mixer.js';
 import { mergeOscState } from '../osc.js';
@@ -44,9 +44,13 @@ import { mergeScenes, renderScenes, setCurrentScene, setQueuedScene } from './sc
 import { renderSidechain } from './sidechain-ui.js';
 import { renderPresets, setSynthFamily } from './synth-ui.js';
 import { setBpm } from './tempo.js';
-import { bufferCache, loadBank, loadPads } from './sounds.js';
+import { bufferCache, loadBank } from './sounds.js';
 import { loadTlBuffers, renderTl, tlRec, tlStopRec } from './tl.js';
 import { tlSelect } from './tl-select.js';
+import { mergeMine, mySnapshot } from './mine.js';
+import { freeName, presetBars } from './presets-bar.js';
+import { TOOL_PRESET_KINDS } from './tool-presets.js';
+import { renderBankMgr } from './banks-ui.js';
 import { mergeBuildup } from '../buildup.js';
 import { mergeDecksState } from '../decks.js';
 import { cleanBuses } from '../timeline.js';
@@ -68,16 +72,6 @@ import { importTrackerFile, isTrackerFile } from './tracker-files.js';
 
 // ---------- Kits (export / import) ----------
 
-// Fichier d'origine d'un pad ; null pour les sons de synthèse (réencodés en WAV).
-export async function padBytes(pad) {
-  if (pad.sampleId?.startsWith('user:')) return (await store.loadSample(pad.sampleId))?.data ?? null;
-  if (pad.sampleId?.startsWith('lib:')) {
-    const r = await fetch(`sounds/${pad.sampleId.slice(4)}`);
-    return r.ok ? r.arrayBuffer() : null;
-  }
-  return null;
-}
-
 export async function unpackPad(s) {
   if (!s) return null;
   const id = `user:${crypto.randomUUID()}`;
@@ -92,26 +86,52 @@ export function replaceBank(b, pads) {
 }
 
 export const PAD_QUANTS = [0, 1, 2, 3, 4, 8, 16];
-// Fichiers de banque (.apckit) : une banque de pads, ou toute la session (25 banques et réglages des instruments).
-// Ouverts / enregistrés depuis la barre de titre des fenêtres Pads et Banques (📂 / 💾), « Tout exporter » dans Banques.
-let kitTarget = 0;   // banque qui reçoit le fichier ouvert
+// Banques de pads dans un fichier .ravebench : une banque (bank) ou toutes (banks). Les sons importés voyagent avec
+// elles, ceux de la bibliothèque sont désignés par leur nom de fichier. Exportées / importées depuis la barre de titre
+// des fenêtres Pads et Banques (⤓ / ⤒), « Exporter tout » dans Banques. Les anciens .apckit s'ouvrent toujours.
+let kitTarget = null;   // banque qui reçoit la banque ouverte (sinon : la banque affichée)
+const padMeta = p => p && { name: p.name, color: p.color, sampleId: p.sampleId, bpm: p.bpm, p: p.p, ...(p.smp ? { smp: p.smp } : {}) };
+const bankIds = banks => banks.flat().map(p => p?.sampleId).filter(Boolean);
 export async function kitExportBank(b = state.bank) {
-  toast(t('kit.exportingBank'));
-  await loadBank(b);
-  const blob = await packBanks([state.banks[b]], padBytes, { kind: 'bank', bpm: state.bpm });
-  download(blob, `${t('kit.file.bank', { n: b + 1 })}-${stamp()}.apckit`);
+  const pads = state.banks[b].map(padMeta);
+  const blob = await packFile('bank', { name: state.bankNames[b] ?? '', bpm: state.bpm, pads }, bankIds([pads]), id => store.loadSample(id));
+  download(blob, `ravebench-${t('kit.file.bank', { n: b + 1 })}-${stamp()}${FILE_EXT}`);
   toast(t('kit.exportedBank'));
 }
 export async function kitExportAll() {
   toast(t('kit.exportingAll'));
-  await loadPads(state.banks.flat());
-  const blob = await packBanks(state.banks, padBytes, { kind: 'session', bpm: state.bpm, globals: state.globals, preset: state.preset, tr: state.tr, tr8: state.tr8, mix: state.mix, scenes: state.scenes });
-  download(blob, `ravebench-session-${stamp()}.apckit`);
+  const banks = state.banks.map(bank => bank.map(padMeta));
+  const blob = await packFile('banks', { bpm: state.bpm, names: state.bankNames, banks }, bankIds(banks), id => store.loadSample(id));
+  download(blob, `ravebench-${t('file.slug.banks')}-${stamp()}${FILE_EXT}`);
   toast(t('kit.exportedAll'));
 }
 export function kitImport(b = state.bank) {
   kitTarget = b;
-  $('#kit-file').click();
+  openFile();
+}
+// Pads lus d'un fichier : 40 cases, sons chargés quand la banque est affichée.
+const readPads = list => Array.from({ length: 40 }, (_, i) => {
+  const s = Array.isArray(list) ? list[i] : null;
+  if (!s || typeof s.sampleId !== 'string') return null;
+  return { name: String(s.name ?? '').slice(0, 24), color: Number.isInteger(s.color) ? s.color : 5, sampleId: s.sampleId, bpm: Number.isFinite(s.bpm) ? s.bpm : 0,
+    p: { ...defaultPositions('pad'), ...s.p }, ...(cleanSmp(s.smp) ? { smp: cleanSmp(s.smp) } : {}), buffer: null };
+});
+async function loadBankFile(f) {
+  const target = kitTarget ?? state.bank;
+  kitTarget = null;
+  if (f.kind === 'bank') {
+    if (state.banks[target].some(Boolean) && !confirm(t('kit.confirmBank', { n: target + 1 }))) return false;
+    replaceBank(target, readPads(f.data.pads));
+    if (typeof f.data.name === 'string' && f.data.name) state.bankNames[target] = f.data.name.slice(0, 32);
+  } else {
+    if (!confirm(t('kit.confirmBanks'))) return false;
+    for (let b = 0; b < BANKS; b++) replaceBank(b, readPads(f.data.banks?.[b]));
+    if (f.data.names && typeof f.data.names === 'object') state.bankNames = Object.fromEntries(Object.entries(f.data.names).filter(([k, v]) => +k < BANKS && typeof v === 'string'));
+  }
+  await loadBank(state.bank);
+  renderAll();
+  renderBankMgr();
+  return true;
 }
 
 export function bindKits() {
@@ -121,39 +141,41 @@ export function bindKits() {
   pq.value = state.padQuant;
   engine.padQuant = state.padQuant;
   pq.addEventListener('change', () => { state.padQuant = engine.padQuant = +pq.value; save(); });
-  $('#kit-file').addEventListener('change', async e => {
-    const file = e.target.files[0];
-    e.target.value = '';
-    if (!file) return;
-    const target = kitTarget;
-    try {
-      toast(t('kit.importing'));
-      const kitData = await unpack(file);
-      if (kitData.kind === 'session') {
-        if (!confirm(t('kit.confirmSession'))) return;
-        for (let b = 0; b < BANKS; b++) replaceBank(b, await Promise.all((kitData.banks[b] ?? new Array(40).fill(null)).map(unpackPad)));
-        Object.assign(state.globals, kitData.globals);
-        applyGlobals();
-        state.preset = migratePreset(kitData.preset);
-        setSynthFamily(presetById(state.preset).family);
-        engine.setVoice(presetById(state.preset).voice);
-        if (kitData.bpm) setBpm(kitData.bpm);
-        if (kitData.scenes) { state.scenes = mergeScenes(kitData.scenes); setCurrentScene(null); renderScenes(); }
-        if (kitData.mix) { state.mix = mergeMixState(kitData.mix); mixer.reload(); CHANNELS.forEach(renderFx); renderMixer(); }
-        if (kitData.tr) { drum.stop(); state.tr = mergeTrState(kitData.tr); drum.setVolume(state.tr.globals.volume); renderTr(); }
-        if (kitData.tr8) { drum808.stop(); state.tr8 = mergeTr8State(kitData.tr8); drum808.setVolume(state.tr8.globals.volume); renderTr(); }
-      } else {
-        if (state.banks[target].some(Boolean) && !confirm(t('kit.confirmBank', { n: target + 1 }))) return;
-        replaceBank(target, await Promise.all(kitData.banks[0].map(unpackPad)));
-      }
-      renderAll();
-      renderPresets();
-      save();
-      toast(t('kit.imported'));
-    } catch (err) {
-      alert(t('kit.failed', { msg: err.message }));
+}
+
+// Ancien fichier de banque (.apckit) : une banque, ou la session (banques et réglages des instruments).
+async function importKit(file) {
+  const target = kitTarget ?? state.bank;
+  kitTarget = null;
+  try {
+    toast(t('kit.importing'));
+    const kitData = await unpack(file);
+    if (kitData.kind === 'session') {
+      if (!confirm(t('kit.confirmSession'))) return;
+      const mine = structuredClone(mySnapshot());
+      for (let b = 0; b < BANKS; b++) replaceBank(b, await Promise.all((kitData.banks[b] ?? new Array(40).fill(null)).map(unpackPad)));
+      Object.assign(state.globals, kitData.globals);
+      applyGlobals();
+      state.preset = migratePreset(kitData.preset);
+      setSynthFamily(presetById(state.preset).family);
+      engine.setVoice(presetById(state.preset).voice);
+      if (kitData.bpm) setBpm(kitData.bpm);
+      if (kitData.scenes) { state.scenes = mergeScenes(kitData.scenes); setCurrentScene(null); renderScenes(); }
+      if (kitData.mix) { state.mix = mergeMixState(kitData.mix); mixer.reload(); CHANNELS.forEach(renderFx); renderMixer(); }
+      if (kitData.tr) { drum.stop(); state.tr = mergeTrState(kitData.tr); drum.setVolume(state.tr.globals.volume); renderTr(); }
+      if (kitData.tr8) { drum808.stop(); state.tr8 = mergeTr8State(kitData.tr8); drum808.setVolume(state.tr8.globals.volume); renderTr(); }
+      mergeMine(mine);
+    } else {
+      if (state.banks[target].some(Boolean) && !confirm(t('kit.confirmBank', { n: target + 1 }))) return;
+      replaceBank(target, await Promise.all(kitData.banks[0].map(unpackPad)));
     }
-  });
+    renderAll();
+    renderPresets();
+    save();
+    toast(t('kit.imported'));
+  } catch (err) {
+    alert(t('kit.failed', { msg: err.message }));
+  }
 }
 
 // ---------- Fichiers : projet, morceau, réglages de chaque outil ----------
@@ -299,9 +321,35 @@ export function openFile() {
   $('#file-input').click();
 }
 
+// Un de vos presets dans un fichier .ravebench (menu ⋯ de la barre de presets).
+export async function exportPreset(kind, preset) {
+  if (!preset) return;
+  const blob = await packFile('preset', { tool: kind, preset: JSON.parse(JSON.stringify(preset)) }, [], id => store.loadSample(id));
+  download(blob, `ravebench-preset-${kind}-${preset.name.replace(/[^\w-]+/g, '_')}${FILE_EXT}`);
+}
+// Preset ouvert : il rejoint les vôtres (nouvel identifiant, nom libre).
+const MINE_KEY = { tr: 'tr', tr8: 'tr8', kick: 'kick', synth: 'synth', osc: 'osc', acid: 'acid' };
+function loadPresetFile(d) {
+  const bar = presetBars[d?.tool];
+  if (!bar || !d.preset || typeof d.preset.name !== 'string') { alert(t('file.failed', { msg: t('file.bad') })); return false; }
+  const p = { ...d.preset, id: `u:${crypto.randomUUID()}`, name: freeName(bar.cfg.user(), d.preset.name.slice(0, 24)) };
+  if (TOOL_PRESET_KINDS.includes(d.tool)) p.cat = 'mine';
+  const n = bar.cfg.user().length;
+  mergeMine(MINE_KEY[d.tool] ? { [MINE_KEY[d.tool]]: [p] } : { tools: { [d.tool]: [p] } });
+  if (bar.cfg.user().length === n) { alert(t('file.failed', { msg: t('file.bad') })); return false; }
+  bar.render();
+  bar.cfg.refresh?.();
+  if (!wm.isOpen(TOOL_WINDOW[d.tool] ?? d.tool)) wm.toggle(TOOL_WINDOW[d.tool] ?? d.tool, true);
+  toast(t('pb.imported', { name: p.name }), 3000);
+  return true;
+}
+const TOOL_WINDOW = { synth: 'piano' };
+
 export async function loadFile(file, demo = false) {
+  if (/\.apckit$/i.test(file.name)) { await importKit(file); return; }
   let f;
   try { f = await readFile(file); } catch (err) { alert(t('file.failed', { msg: err.message })); return; }
+  if (f.kind === 'preset') { if (loadPresetFile(f.data)) save(); return; }
   const what = t(`file.kind.${f.kind}`);
   if (f.kind === 'project' && !confirm(t('file.confirmProject'))) return;
   if (f.kind === 'song' && !demo && state.tl.tracks.some(tr => tr.clips.length || tr.fx.length) && !confirm(t('file.confirmSong'))) return;
@@ -310,10 +358,15 @@ export async function loadFile(file, demo = false) {
     await store.saveSample(id, { name: s.name, data: s.data });
     bufferCache.delete(id);
   }
+  if (f.kind === 'bank' || f.kind === 'banks') {
+    if (await loadBankFile(f)) { save(); toast(t('file.loaded', { what }), 3000); }
+    return;
+  }
   if (f.kind === 'project') {
     // Tout l'état est remplacé : on l'écrit tel quel, puis l'application redémarre dessus.
     setProjectLoading(true);
     clearTimeout(saveTimer);
+    await store.saveMine(mySnapshot());   // vos presets et sons rejoignent ceux du projet au redémarrage
     await store.saveState(f.data);
     location.reload();
     return;
@@ -348,7 +401,9 @@ export async function loadFile(file, demo = false) {
     renderTl();
     renderLibrary();
   } else {
+    const mine = structuredClone(mySnapshot());
     await TOOL_IO[f.kind].set(f.data);
+    mergeMine(mine);   // le fichier apporte ses presets sans effacer les vôtres
     if (Object.keys(f.samples).length) renderLibrary();
     if (!wm.isOpen(f.kind)) wm.toggle(f.kind, true);
     renderKnobs();

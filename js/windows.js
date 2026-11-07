@@ -159,7 +159,7 @@ export class WindowManager {
     close.setAttribute('aria-label', t('win.close'));
     close.addEventListener('click', () => this.toggle(id, false));
     if (this.files?.ids.has(id)) {
-      for (const [kind, icon] of [['open', 'folder'], ['save', 'save']]) {
+      for (const [kind, icon] of [['open', 'upload'], ['save', 'download']]) {
         const b = document.createElement('button');
         b.className = 'win-file icon-only';
         b.dataset.icon = icon;

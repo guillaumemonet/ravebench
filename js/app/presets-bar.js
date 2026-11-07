@@ -13,6 +13,7 @@ import { renderKnobs } from './knobs.js';
 import { toast } from './misc.js';
 import { loadOscPreset, renderOsc } from './osc-ui.js';
 import { rollPresetOptions } from './roll-ui.js';
+import { exportPreset, openFile } from './files.js';
 import { save } from './save.js';
 import { applyPreset, renderSynthKnobs } from './synth-ui.js';
 import { DRUM_DEFS, renderTr } from './drum-ui.js';
@@ -20,16 +21,29 @@ import { DRUM_DEFS, renderTr } from './drum-ui.js';
 // ---------- Barre de presets (instruments) ----------
 
 
-// Un menu par catégories (presets fournis, puis « Mes presets »), Enregistrer sous un nom et une catégorie, Supprimer.
-// cfg : { cats, catLabel(cat), builtins: [{ id, cat, name }], user(): [{ id, cat, name }], current(): id | null,
-//         apply(id), save(name, cat) -> id, remove(id) }
+// Un menu par catégories (presets fournis, puis les vôtres ★), « Garder comme preset » sous un nom et une catégorie,
+// et le menu ⋯ du preset choisi : renommer, dupliquer, exporter dans un fichier, importer, supprimer. Le même partout.
+// cfg : { kind (outil, pour les fichiers de preset), cats, catLabel(cat), builtins: [{ id, cat, name }],
+//         user(): [{ id, cat, name, … }] (la liste de l'état), current(): id | null, apply(id), save(name, cat) -> id,
+//         remove(id), refresh?() (après un changement de nom ou un import : menus qui listent vos presets) }
+export const presetBars = {};   // outil -> barre (import d'un fichier de preset)
+let menu = null;
+function closeMenu() { menu?.remove(); menu = null; window.removeEventListener('pointerdown', outside, true); }
+const outside = e => { if (menu && !menu.contains(e.target)) closeMenu(); };
+// Nom libre : « Basse », « Basse 2 », « Basse 3 »…
+export function freeName(list, name) {
+  if (!list.some(p => p.name === name)) return name;
+  const base = name.replace(/ \d+$/, '').slice(0, 21);
+  for (let n = 2; ; n++) if (!list.some(p => p.name === `${base} ${n}`)) return `${base} ${n}`;
+}
+
 export function presetBar(wrap, cfg) {
   wrap.classList.add('preset-bar');
   wrap.innerHTML = `<select class="pb-sel" title="${t('pb.title')}"></select>
     <input class="pb-name" maxlength="24" spellcheck="false" placeholder="${t('pb.namePh')}">
     <select class="pb-cat" title="${t('pb.cat')}"></select>
-    <button class="pb-save" data-icon="save" title="${t('pb.save.title')}">${t('pb.save')}</button>
-    <button class="pb-del icon-only" data-icon="trash" title="${t('pb.del')}" aria-label="${t('pb.del')}"></button>`;
+    <button class="pb-save" data-icon="star" title="${t('pb.save.title')}">${t('pb.save')}</button>
+    <button class="pb-more icon-only" title="${t('pb.more')}" aria-label="${t('pb.more')}">⋯</button>`;
   const sel = wrap.querySelector('.pb-sel'), name = wrap.querySelector('.pb-name'), cat = wrap.querySelector('.pb-cat');
   for (const c of cfg.cats) cat.add(new Option(cfg.catLabel(c), c));
   cat.hidden = cfg.cats.length < 2;   // une seule catégorie (vos réglages) : pas de menu
@@ -47,10 +61,10 @@ export function presetBar(wrap, cfg) {
     sel.value = cfg.current() ?? '';
     sel.options[0].hidden = cfg.current() != null;
     const mine = cfg.user().find(u => u.id === cfg.current());
-    wrap.querySelector('.pb-del').disabled = !mine;
     if (mine) cat.value = mine.cat;
     else { const b = cfg.builtins.find(p => p.id === cfg.current()); if (b) cat.value = b.cat; }
   };
+  const changed = () => { render(); cfg.refresh?.(); save(); };
   sel.addEventListener('change', () => { if (sel.value) cfg.apply(sel.value); render(); });
   wrap.querySelector('.pb-save').addEventListener('click', () => {
     const n = (name.value.trim() || t('pb.defaultName', { n: cfg.user().length + 1 })).slice(0, 24);
@@ -59,14 +73,59 @@ export function presetBar(wrap, cfg) {
     render();
     toast(t('pb.saved', { name: n }));
   });
-  wrap.querySelector('.pb-del').addEventListener('click', () => {
+  // Menu ⋯ du preset affiché.
+  wrap.querySelector('.pb-more').addEventListener('click', e => {
+    if (menu) { closeMenu(); return; }
     const id = cfg.current();
-    if (!cfg.user().some(u => u.id === id)) return;
-    cfg.remove(id);
-    render();
+    const mine = cfg.user().find(u => u.id === id);
+    const shown = mine ?? cfg.builtins.find(p => p.id === id);
+    menu = document.createElement('div');
+    menu.className = 'clip-menu pb-menu';
+    const head = document.createElement('div');
+    head.className = 'cm-head';
+    head.textContent = shown ? `${mine ? '★ ' : ''}${shown.name}` : t('pb.custom');
+    menu.appendChild(head);
+    const item = (label, icon, fn, disabled = false) => {
+      const b = document.createElement('button');
+      b.className = 'cm-item';
+      b.textContent = label;
+      b.dataset.icon = icon;
+      b.disabled = disabled;
+      b.addEventListener('click', () => { closeMenu(); fn(); });
+      menu.appendChild(b);
+    };
+    if (mine) {
+      const input = Object.assign(document.createElement('input'), { className: 'bm-rename', value: mine.name, maxLength: 24 });
+      input.addEventListener('keydown', ev => { ev.stopPropagation(); if (ev.key === 'Enter') closeMenu(); });
+      input.addEventListener('change', () => {
+        const v = input.value.trim().slice(0, 24);
+        if (v && v !== mine.name) { mine.name = freeName(cfg.user().filter(u => u !== mine), v); changed(); }
+      });
+      const row = document.createElement('label');
+      row.className = 'cm-row';
+      row.append(Object.assign(document.createElement('span'), { textContent: t('pb.rename') }), input);
+      menu.appendChild(row);
+    }
+    item(t('pb.duplicate'), 'plus', () => {
+      const n = freeName(cfg.user(), shown?.name ?? t('pb.defaultName', { n: cfg.user().length + 1 }));
+      cfg.save(n, cat.value);
+      changed();
+      toast(t('pb.saved', { name: n }));
+    });
+    item(t('pb.export'), 'download', () => exportPreset(cfg.kind, mine), !mine);
+    item(t('pb.import'), 'upload', openFile);
+    menu.appendChild(document.createElement('hr'));
+    item(t('pb.del'), 'trash', () => { cfg.remove(id); render(); cfg.refresh?.(); }, !mine);
+    document.body.appendChild(menu);
+    const r = e.currentTarget.getBoundingClientRect(), m = menu.getBoundingClientRect();
+    menu.style.left = `${Math.max(8, Math.min(r.right - m.width, innerWidth - m.width - 8))}px`;
+    menu.style.top = `${Math.max(8, Math.min(r.bottom + 4, innerHeight - m.height - 8))}px`;
+    setTimeout(() => window.addEventListener('pointerdown', outside, true));
   });
   render();
-  return { render };
+  const bar = { render, cfg };
+  if (cfg.kind) presetBars[cfg.kind] = bar;
+  return bar;
 }
 
 // Kits de son des boîtes à rythmes (TR-909 : 'tr', TR-808 : 'tr8').
@@ -74,6 +133,7 @@ export const drumPresets = {};
 export function buildDrumPresets(id) {
   const def = DRUM_DEFS[id], st = () => state[id];
   drumPresets[id] = presetBar($(`#${id}-pbar`), {
+    kind: id,
     cats: def.cats,
     catLabel: c => t(`tr.cat.${c}`),
     builtins: def.kits.map(k => ({ id: k.id, cat: k.cat, name: t(`${id}.kit.${k.id}`) })),
@@ -104,7 +164,9 @@ export function buildDrumPresets(id) {
 export let kickPresets = null;
 export function buildKickPresets() {
   kickPresets = presetBar($('#kick-pbar'), {
+    kind: 'kick',
     cats: KICK_CATS,
+    refresh: () => { rollPresetOptions(); renderKick(); },
     catLabel: c => t(`kick.cat.${c}`),
     builtins: Object.keys(KICK_PRESETS).map(id => ({ id, cat: KICK_PRESET_CAT[id], name: t(`kick.preset.${id}`) })),
     user: () => state.kick.user,
@@ -138,6 +200,7 @@ export let synthPresets = null;
 export const synthCurrent = () => (state.synthDirty ? null : state.synthPick ?? state.preset);
 export function buildSynthPresets() {
   synthPresets = presetBar($('#synth-pbar'), {
+    kind: 'synth',
     cats: FAMILIES,
     catLabel: f => t(`family.${f}`),
     builtins: PRESETS.map(p => ({ id: p.id, cat: p.family, name: p.name })),
@@ -182,7 +245,9 @@ export function synthTouched() {
 export let oscPresets = null;
 export function buildOscPresets() {
   oscPresets = presetBar($('#osc-pbar'), {
+    kind: 'osc',
     cats: OSC_CATS,
+    refresh: () => { renderOsc(); rollPresetOptions(); },
     catLabel: c => t(`osc.cat.${c}`),
     builtins: OSC_PRESETS.map(p => ({ id: p.id, cat: OSC_PRESET_CAT[p.id] ?? 'lead', name: t(`osc.preset.${p.id}`) })),
     user: () => state.osc.user,
@@ -206,6 +271,7 @@ export function buildOscPresets() {
 export let acidPresets = null;
 export function buildAcidPresets() {
   acidPresets = presetBar($('#acid-presets'), {
+    kind: 'acid',
     cats: ACID_CATS,
     catLabel: c => t(`acid.cat.${c}`),
     builtins: ACID_SOUNDS.map(s => ({ id: s.id, cat: s.cat, name: t(`acid.snd.${s.id}`) })),

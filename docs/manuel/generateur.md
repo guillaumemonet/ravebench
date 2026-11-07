@@ -52,7 +52,7 @@ Un bloc d'accord se manipule comme les autres : le déplacer, l'allonger, le cop
 - **Écouter** une idée, puis **Choisir** : elle devient le brouillon de la mélodie. Chaque choix **apprend votre goût** (la moyenne des traits des idées choisies) : les suggestions suivantes s'en rapprochent de plus en plus. Le goût est enregistré avec le projet.
 - **Suggérer des suites** (onglet Accords) : des suites d'accords d'hymne dans la tonalité de votre suite, construites à partir des enchaînements les plus courants du hardcore et du hardstyle en mineur (i, VI, VII, III, iv, v, V) ; un clic en utilise une.
 
-Le **Générateur**, le **Breizh generator**, le **Designer de montée**, le **Générateur de voix** et la **Correction de justesse** ont une barre de presets comme les instruments : réglez, tapez un nom, **Enregistrer** ; vos réglages (★) se rappellent depuis le menu, la corbeille les supprime. Ils sont enregistrés avec le projet.
+Le **Générateur**, le **Breizh generator**, le **Designer de montée**, le **Générateur de voix** et la **Correction de justesse** ont une barre de presets comme les instruments : réglez, tapez un nom, **Garder** ; vos réglages (★) se rappellent depuis le menu, le menu **⋯** les renomme, les duplique, les exporte ou les supprime. Ils restent à vous, même quand vous ouvrez un autre projet.
 
 ## Breizh generator
 

@@ -26,7 +26,7 @@ export default async function (t, A) {
   t.ok(S.acid.params.reso !== reso, 'un autre preset change les réglages');
   sel.value = S.acid.user[0].id; sel.dispatchEvent(new Event('change'));
   t.near(S.acid.params.reso, reso, 1e-6, 'recharger le preset perso rend ses réglages');
-  t.$('#acid-presets .pb-del').click();
+  t.$('#acid-presets .pb-more').click(); t.$('.pb-menu .cm-item[data-icon="trash"]').click();
   t.eq(S.acid.user.length, 0, 'suppression');
   t.ok(A.acid.p('slide') > 0.02 && A.acid.p('slide') < 0.3, 'durée de glissé raisonnable (s)', A.acid.p('slide'));
   t.ok('user' in A.TOOL_IO.acid.get().acid, 'les fichiers de réglages TB-303 emportent les presets perso');

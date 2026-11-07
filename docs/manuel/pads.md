@@ -52,7 +52,7 @@ La fenêtre **Banques** (groupe Studio) sert à ranger les sons ; la fenêtre Pa
   - **glisser un pad sur un autre** les échange ; avec **Alt**, il est copié ;
   - **glisser un pad sur une banque de la liste** l'y déplace, au premier pad libre (Alt = copie) ;
   - **clic** : écouter ; **clic droit** : écouter, renommer, changer de couleur, ouvrir dans l'éditeur de pad, vider.
-- Pour la banque : **Jouer** (en faire la banque jouée), **Dupliquer** (copie dans la première banque vide), **Vider**, **Tout exporter** (les 25 banques et les réglages des instruments) ; 📁 / 💾 dans la barre de titre ouvrent et enregistrent la banque (.apckit).
+- Pour la banque : **Jouer** (en faire la banque jouée), **Dupliquer** (copie dans la première banque vide), **Vider**, **Exporter tout** (les 25 banques, dans un fichier) ; ⤒ / ⤓ dans la barre de titre importent et exportent la banque.
 - Tout s'annule avec Ctrl+Z et est enregistré avec le projet. Pour mettre un bloc de la timeline sur un pad précis : clic droit sur le bloc › **Envoyer vers…** (voir [Timeline](timeline.md)).
 
 ## Tempo et boucles
