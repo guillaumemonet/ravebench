@@ -22,7 +22,11 @@ Ravebench enregistre tout automatiquement dans le navigateur, et vous pouvez aus
 - **● REC** dans l'en-tête enregistre la sortie générale en direct, y compris ce que vous jouez et les effets de performance. Un second appui télécharge un fichier WAV.
 - **Banques** : ⤓ dans la barre de titre des fenêtres **Pads** et **Banques** exporte la banque, **Exporter tout** (fenêtre Banques) toutes les banques, dans un fichier `.ravebench` avec leurs pads et leurs sons importés. ⤒ l'importe : une banque va dans la banque affichée, un fichier de toutes les banques les remplace toutes. Les réglages des instruments, eux, voyagent avec le projet.
 
-Vos banques, vos sons et vos réglages sont sauvegardés automatiquement dans le navigateur.
+Vos banques, vos sons et vos réglages sont sauvegardés automatiquement dans le navigateur (Ravebench lui demande de les garder, pour qu'il ne les efface pas quand le disque manque de place). Si l'enregistrement échoue (disque plein, navigation privée), un message le signale : exportez alors le projet avec 💾 pour ne pas le perdre. Une sauvegarde en attente est écrite dès que l'onglet est masqué ou fermé.
+
+Si l'application ne peut pas démarrer (sauvegarde abîmée, par exemple), l'écran de démarrage propose **Télécharger la sauvegarde** (la sauvegarde telle quelle, dans un fichier JSON) et **Démarrer avec un projet vide** : la sauvegarde actuelle est mise de côté dans le navigateur, pas effacée, et vos presets, courbes et sons restent.
+
+**Les fichiers ouverts sont sûrs** : un nom ou un son d'un fichier est toujours lu comme du texte ou de l'audio, jamais comme du code, et un son embarqué doit être dans le fichier lui-même (un fichier ne fait jamais contacter une autre adresse par l'application).
 
 ## Fichiers MIDI
 

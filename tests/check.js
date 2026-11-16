@@ -42,6 +42,8 @@ const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
 for (const id of new Set(ids.filter((x, i) => ids.indexOf(x) !== i))) fail(`index.html : id en double : ${id}`);
 // Chaque module est dans l'import map d'index.html (version des scripts, contre les anciens caches).
 for (const f of js) if (!/-(worklet|worker).js$/.test(f) && !html.includes(`"./js/${f}": "./js/${f}?v=`)) fail(`index.html : module absent de l'import map : js/${f}`);
+// Politique de sécurité (CSP) : l'empreinte de l'import map doit suivre ses changements (tools/csp.js).
+{ const { cspProblem } = await import(pathToFileURL(path.join(ROOT, 'tools', 'csp.js'))); const p = cspProblem(html); if (p) fail(p); }
 
 // 3. Aide.
 const { HELP } = await import(pathToFileURL(path.join(ROOT, 'js', 'help.js')));

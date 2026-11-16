@@ -22,7 +22,11 @@ Ravebench saves everything automatically in the browser, and you can also keep y
 - **● REC** in the header records the master output live, including what you play and the performance effects. Press it again to download a WAV file.
 - **Banks**: ⤓ in the title bar of the **Pads** and **Banks** windows exports the bank, **Export all** (Banks window) all the banks, in a `.ravebench` file with their pads and imported sounds. ⤒ imports it: a bank goes into the displayed bank, a file of all the banks replaces them all. The instrument settings travel with the project.
 
-Your banks, sounds and settings are saved automatically in the browser.
+Your banks, sounds and settings are saved automatically in the browser (Ravebench asks it to keep them, so that it does not erase them when the disk runs short of space). If saving fails (disk full, private browsing), a message says so: export the project with 💾 so as not to lose it. A pending save is written as soon as the tab is hidden or closed.
+
+If the application cannot start (a damaged save, for example), the start screen offers **Download the save** (the save as it is, in a JSON file) and **Start with an empty project**: the current save is put aside in the browser, not deleted, and your presets, curves and sounds stay.
+
+**Files you open are safe**: a name or a sound in a file is always read as text or audio, never as code, and an embedded sound must be in the file itself (a file never makes the application contact another address).
 
 ## MIDI files
 

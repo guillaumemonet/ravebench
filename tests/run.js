@@ -69,7 +69,8 @@ const MUTE = `<script>(() => {
 const testPage = spec => {
   let html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   if (!process.env.TEST_SOUND) html = html.replace('<head>', `<head>${MUTE}`);
-  const out = html.replace(/<script type="module" src="js\/main\.js\?v=\d+"><\/script>/,
+  // Sans la CSP de index.html : la page de test ajoute ses propres scripts (harnais, accès aux modules par eval).
+  const out = html.replace(/<meta http-equiv="Content-Security-Policy" content="[^"]*">/, '').replace(/<script type="module" src="js\/main\.js\?v=\d+"><\/script>/,
     `<script type="module" src="js/__test_main.js"></script><script type="module">import run from '/tests/harness.js'; run(${JSON.stringify(spec)});</script>`);
   if (out === html) throw new Error('index.html : balise de main.js introuvable');
   return out;

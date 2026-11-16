@@ -31,7 +31,7 @@ L'écran principal : la **bibliothèque de sons** à gauche, la **timeline** à 
   - **Séquenceur pas à pas** : il démarre avec l'enregistrement ; chacun de ses coups devient un bloc du pad joué, avec sa force.
   - **TR-909** / **TR-808** / **TB-303** / **Platines** : l'instrument démarre calé sur les mesures de la timeline et s'enregistre en audio dans un bloc (aussi rangé dans la bibliothèque, rubrique Enregistrements).
   - **■ Arrêter rec** (ou REC à nouveau) termine l'enregistrement.
-- **Lire** : ▶ (ou PLAY sur l'APC) joue depuis la tête de lecture, et le même bouton arrête ; la vue suit la tête de lecture. Les boucles faites à un autre tempo suivent le tempo global. La timeline a sa propre voie dans la table de mixage.
+- **Lire** : ▶ (ou PLAY sur l'APC, ou la **barre d'espace** partout sauf dans un champ de saisie ou une liste déroulante) joue depuis la tête de lecture, et le même bouton arrête ; la vue suit la tête de lecture. Les boucles faites à un autre tempo suivent le tempo global. La timeline a sa propre voie dans la table de mixage.
 
 ### Automation
 

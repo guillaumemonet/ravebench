@@ -8,7 +8,7 @@ import { $, decks, engine, state, timeline, wm } from './core.js';
 import { arcPath, renderKnobs } from './knobs.js';
 import { libSelected, renderLibrary } from './library-ui.js';
 import { toast } from './misc.js';
-import { save } from './save.js';
+import { save, saveSettings } from './save.js';
 import { bufferCache } from './sounds.js';
 import { ensureBuffer } from './tl.js';
 
@@ -82,7 +82,7 @@ export function buildDecks() {
     els.sync.addEventListener('click', () => { s().sync = !s().sync; deck.update(); renderDecks(); save(); });
     els.loop.addEventListener('click', () => { s().loop = !s().loop; deck.update(); renderDecks(); save(); });
     els.load.addEventListener('click', () => { if (libSelected) loadDeck(id, libSelected); else toast(t('deck.pickFirst'), 3000); });
-    els.pitch.addEventListener('input', () => { s().pitch = +els.pitch.value; deck.update(); renderDecks(); save(); });
+    els.pitch.addEventListener('input', () => { s().pitch = +els.pitch.value; deck.update(); renderDecks(); saveSettings(); });
     els.pitch.addEventListener('dblclick', () => { s().pitch = 0; deck.update(); renderDecks(); save(); });
     // Forme d'onde : un clic place la lecture (ou le cue à l'arrêt).
     els.wave.addEventListener('pointerdown', e => {
@@ -134,7 +134,7 @@ export function buildDecks() {
           <path class="arc" fill="none" stroke-width="8" stroke-linecap="round"/>
         </svg>
         <div class="value"></div><div class="label">${t(`deck.k.${k}`)}</div>`;
-      const turn = pos => { cancelAuto(true); s()[k] = Math.min(1, Math.max(0, pos)); deck.update(); renderDecks(); if (state.page === 'decks') renderKnobs(); save(); };
+      const turn = pos => { cancelAuto(true); s()[k] = Math.min(1, Math.max(0, pos)); deck.update(); renderDecks(); if (state.page === 'decks') renderKnobs(); saveSettings(); };
       let y = null;
       knob.addEventListener('pointerdown', e => { y = e.clientY; try { knob.setPointerCapture(e.pointerId); } catch { /* pointeur déjà relâché */ } });
       knob.addEventListener('pointermove', e => { if (y === null || Math.abs(y - e.clientY) < 2) return; turn(s()[k] + (y - e.clientY) * 0.005 * (e.shiftKey ? 0.25 : 1)); y = e.clientY; });
@@ -147,7 +147,7 @@ export function buildDecks() {
   }
   const xf = $('#deck-xfade');
   $('#deck-auto').addEventListener('click', autoTransition);
-  xf.addEventListener('input', () => { cancelAuto(true); state.decks.xfade = +xf.value; decks.update(); if (state.page === 'decks') renderKnobs(); save(); });
+  xf.addEventListener('input', () => { cancelAuto(true); state.decks.xfade = +xf.value; decks.update(); if (state.page === 'decks') renderKnobs(); saveSettings(); });
   xf.addEventListener('dblclick', () => { state.decks.xfade = 0.5; decks.update(); renderDecks(); save(); });
   // Sons déjà chargés (sauvegarde) : remis sur les decks, à l'arrêt.
   for (const id of DECK_IDS) {

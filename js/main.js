@@ -61,7 +61,7 @@ import { bindComputerKeyboard, buildPiano } from './app/piano.js';
 import { buildPluginBar, onWindowToggle } from './app/plugins.js';
 import { buildDrumPresets, buildKickPresets } from './app/presets-bar.js';
 import { buildRoll } from './app/roll-ui.js';
-import { restore, save } from './app/save.js';
+import { bindSaveFlush, restore, save } from './app/save.js';
 import { buildScenes } from './app/scenes.js';
 import { loadPad } from './app/sounds.js';
 import { needsWarp, warpedBuffer } from './app/warp.js';
@@ -75,13 +75,42 @@ import { buildSeq, onSeqStep, renderSeq, seqHit } from './app/seq-ui.js';
 import { buildSlicer } from './app/slicer-ui.js';
 import { cleanRecordings, initHistory } from './app/undo.js';
 import { buildViz } from './app/viz-ui.js';
+import * as store from './storage.js';
 
 // ---------- Démarrage ----------
 
 $('#start-btn').addEventListener('click', () => start().catch(err => {
   console.error(err);
   $('#start-msg').textContent = t('start.error', { msg: err.message });
+  startRescue();
 }));
+
+// Démarrage en échec (sauvegarde abîmée, par exemple) : récupérer la sauvegarde telle quelle dans un fichier,
+// ou repartir d'un projet vide en gardant l'ancienne de côté dans le navigateur.
+async function startRescue() {
+  if ($('#start-rescue')) return;
+  const [main, mine] = await Promise.all([store.loadState(), store.loadMine()]).catch(() => [null, null]);
+  const box = document.createElement('div');
+  box.id = 'start-rescue';
+  const exp = Object.assign(document.createElement('button'), { textContent: t('start.rescueExport'), title: t('start.rescueExport.title') });
+  exp.dataset.icon = 'download';
+  exp.disabled = !main && !mine;
+  exp.addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify({ format: 'ravebench-raw-save', saved: new Date().toISOString(), main, mine })], { type: 'application/json' });
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `ravebench-${t('start.rescueSlug')}.json` });
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  });
+  const fresh = Object.assign(document.createElement('button'), { textContent: t('start.rescueFresh'), title: t('start.rescueFresh.title') });
+  fresh.dataset.icon = 'reset';
+  fresh.addEventListener('click', async () => {
+    if (!confirm(t('start.rescueFresh.confirm'))) return;
+    await store.setAsideState();
+    location.reload();
+  });
+  box.append(exp, fresh);
+  $('#start-msg').after(box);
+}
 
 async function start() {
   $('#start-btn').disabled = true;
@@ -91,6 +120,7 @@ async function start() {
   await engine.initMaster();   // limiteur et compteur de sonie
   provide({ kit: await renderDefaultKit() });
   await restore();
+  bindSaveFlush();
   applyGlobals();
   engine.setBpm(state.bpm);
   engine.setMaster(state.master);

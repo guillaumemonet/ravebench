@@ -80,6 +80,8 @@ Ravebench est une page web sans étape de compilation : des modules JavaScript (
 
 **Version des scripts.** Après une modification, incrémenter la version `?v=` dans `index.html` (toutes les lignes de l'import map et la balise de `main.js`) pour que les navigateurs ne gardent pas l'ancienne version en cache.
 
+**Politique de sécurité (CSP).** `index.html` n'autorise que ses propres scripts, l'import map (par son empreinte SHA-256) et les bibliothèques de la voix (cdnjs, jsDelivr) : un nom piégé dans un fichier ouvert ne peut rien exécuter. L'empreinte change avec l'import map : après un nouveau module ou un changement de `?v=`, lancer `node tools/csp.js` (`npm run check` signale une empreinte périmée). La page de test (`tests/run.js`) est servie sans CSP ; `files-security` vérifie la vraie page dans un cadre. Afficher un texte venu d'un fichier avec `textContent`, jamais avec `innerHTML`.
+
 ## Tests
 
 Voir [tests.md](tests.md). Dans un test, `A` donne accès à toutes les variables de `js/main.js` et des modules de `js/app/`.

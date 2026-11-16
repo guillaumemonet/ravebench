@@ -24,7 +24,7 @@ export let queuedScene = null;
 
 export function mergeScenes(saved) {
   const out = new Array(SCENES).fill(null);
-  if (Array.isArray(saved)) saved.slice(0, SCENES).forEach((s, i) => { out[i] = s ?? null; });
+  if (Array.isArray(saved)) saved.slice(0, SCENES).forEach((s, i) => { out[i] = s && typeof s === 'object' && !Array.isArray(s) ? s : null; });
   return out;
 }
 
@@ -152,7 +152,7 @@ export function renderScenes() {
   $('#scene-apc').classList.toggle('active', sceneMode);
   sceneEls.forEach((btn, n) => {
     const sc = state.scenes[n];
-    btn.innerHTML = `<b>${n + 1}</b><small>${sc ? t('scene.summary', { tr: sc.tr.pattern + 1, loops: sc.loops.length }) : ''}</small>`;
+    btn.innerHTML = `<b>${n + 1}</b><small>${sc ? t('scene.summary', { tr: (Math.trunc(sc.tr?.pattern) || 0) + 1, loops: Array.isArray(sc.loops) ? sc.loops.length : 0 }) : ''}</small>`;
     btn.classList.toggle('empty', !sc);
     btn.classList.toggle('current', n === currentScene);
     btn.classList.toggle('queued', n === queuedScene);

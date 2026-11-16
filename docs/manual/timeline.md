@@ -31,7 +31,7 @@ The main screen: the **sound library** on the left, the **timeline** on the righ
   - **Step sequencer**: it starts with the recording; each of its hits becomes a block of the pad played, with its velocity.
   - **TR-909** / **TR-808** / **TB-303** / **Decks**: the instrument starts on the timeline's bars and is recorded as audio into a block (also listed in the library under Recordings).
   - **■ Stop rec** (or REC again) ends the recording.
-- **Play**: ▶ (or PLAY on the APC) plays from the playhead, and the same button stops; the view follows the playhead. Loops recorded at another tempo follow the global tempo. The timeline has its own channel in the mixer.
+- **Play**: ▶ (or PLAY on the APC, or the **space bar** anywhere except in a text field or a drop-down list) plays from the playhead, and the same button stops; the view follows the playhead. Loops recorded at another tempo follow the global tempo. The timeline has its own channel in the mixer.
 
 ### Automation
 

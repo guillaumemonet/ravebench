@@ -8,7 +8,7 @@ import { levelMeter, peakOf } from './meters.js';
 import { fxOptions, renderInsertRack } from './inserts-ui.js';
 import { renderKnobs } from './knobs.js';
 import { renderMixerDest } from './patch-ui.js';
-import { save } from './save.js';
+import { save, saveSettings } from './save.js';
 
 // ---------- Table de mixage ----------
 
@@ -58,7 +58,7 @@ export function buildMixer() {
     engine.set('master', toValue(masterDef(), state.globals.master));
     renderMixer();
     if (mixField(state.page) || state.page === 'fx') renderKnobs();
-    save();
+    saveSettings();
   });
   stripEls.master = m;
   wrap.appendChild(m);
@@ -70,7 +70,7 @@ export function onMixChange(id) {
   mixer.update();
   renderStrip(id);
   if (mixField(state.page)) renderKnobs();
-  save();
+  saveSettings();
 }
 
 export function renderStrip(id) {

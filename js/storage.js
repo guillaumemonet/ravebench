@@ -23,6 +23,7 @@ async function tx(store, mode, fn) {
     const req = fn(t.objectStore(store));
     t.oncomplete = () => resolve(req?.result);
     t.onerror = () => reject(t.error);
+    t.onabort = () => reject(t.error ?? new Error('aborted'));   // disque plein : la transaction est annulée
   });
 }
 
@@ -40,6 +41,12 @@ export async function clearProject(keep) {
   await tx('state', 'readwrite', s => s.delete('main'));
   const ids = await listSampleIds();
   await Promise.all(ids.filter(id => !keep.includes(id)).map(deleteSample));
+}
+// Démarrage impossible : la sauvegarde est mise de côté (« broken:<date> »), l'application repart d'un projet vide.
+export async function setAsideState() {
+  const main = await loadState();
+  if (main) await tx('state', 'readwrite', s => s.put(main, `broken:${new Date().toISOString()}`));
+  await tx('state', 'readwrite', s => s.delete('main'));
 }
 export const clearAll = () => Promise.all([
   tx('state', 'readwrite', s => s.clear()),

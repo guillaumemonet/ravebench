@@ -5,7 +5,7 @@ import { MASTER_PARAMS, defaultMasterState } from '../audio.js';
 import { t } from '../i18n.js';
 import { LoudnessMeter } from '../lufs.js';
 import { $, engine, state, wm } from './core.js';
-import { save } from './save.js';
+import { save, saveSettings } from './save.js';
 
 export const masterMeter = new LoudnessMeter();
 export let lastExport = null;      // { integrated, peakDb } du dernier export WAV
@@ -61,7 +61,7 @@ export function buildMaster() {
 export function applyMaster() {
   engine.setMaster(state.master);
   renderMaster();
-  save();
+  saveSettings();
 }
 
 export function renderMaster() {

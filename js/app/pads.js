@@ -57,6 +57,7 @@ export function renderPad(i) {
   el.classList.toggle('loop', !!pad && MODES[toValue(PAGES.pad.params[7], pad.p.mode)] === 'loop');
   el.style.setProperty('--c', pad ? PALETTE[uiColor(pad.color)] : '#444');
   el.querySelector('.name').textContent = pad ? pad.name : t('pad.empty');
+  el.title = pad ? pad.name : '';
 }
 
 export function renderPads() { for (let i = 0; i < 40; i++) renderPad(i); renderPadKnobs(); }

@@ -73,7 +73,7 @@ import { importTrackerFile, isTrackerFile } from './tracker-files.js';
 // ---------- Kits (export / import) ----------
 
 export async function unpackPad(s) {
-  if (!s) return null;
+  if (!s?.bytes) return null;
   const id = `user:${crypto.randomUUID()}`;
   await store.saveSample(id, { name: s.name, data: s.bytes });
   const buffer = await engine.ctx.decodeAudioData(s.bytes.slice(0)).catch(() => null);
@@ -126,7 +126,7 @@ async function loadBankFile(f) {
   } else {
     if (!confirm(t('kit.confirmBanks'))) return false;
     for (let b = 0; b < BANKS; b++) replaceBank(b, readPads(f.data.banks?.[b]));
-    if (f.data.names && typeof f.data.names === 'object') state.bankNames = Object.fromEntries(Object.entries(f.data.names).filter(([k, v]) => +k < BANKS && typeof v === 'string'));
+    if (f.data.names && typeof f.data.names === 'object') state.bankNames = Array.from({ length: BANKS }, (_, b) => (typeof f.data.names[b] === 'string' ? f.data.names[b].slice(0, 32) : ''));
   }
   await loadBank(state.bank);
   renderAll();

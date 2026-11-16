@@ -231,6 +231,14 @@ export function tlTarget(ev) {
 
 export function buildTl() {
   $('#tl-play').addEventListener('click', tlToggle);
+  // Barre d'espace : lecture / arrêt de la timeline, partout sauf dans un champ de saisie ou un menu déroulant
+  // (le piano roll, quand sa fenêtre est active, la prend avant pour écouter son motif).
+  window.addEventListener('keydown', e => {
+    if (e.code !== 'Space' || e.repeat || e.defaultPrevented || e.ctrlKey || e.altKey || e.metaKey) return;
+    if (e.target.closest?.('input, textarea, select, [contenteditable], [role="slider"], canvas[tabindex]')) return;
+    e.preventDefault();
+    tlToggle();
+  });
   $('#tl-demo').addEventListener('click', e => openDemoMenu(e.currentTarget));
   $('#tl-export').addEventListener('click', () => exportSong(false));
   $('#tl-stems').addEventListener('click', () => exportSong(true));

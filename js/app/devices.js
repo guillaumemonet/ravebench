@@ -179,6 +179,7 @@ export function renderDevices() {
   // La page des potentiomètres de l'APC, quand il suit la fenêtre active (le repère du live).
   if (apc?.connected && deviceInst(APC_DEVICE) === 'auto') text += ` · ${pageLabel(state.page)}`;
   $('#status-text').textContent = text;
+  $('#status-text').title = text;   // entier dans la bulle (il peut être coupé à l'écran)
   box.classList.toggle('on', n > 0);
   box.classList.toggle('off', n === 0);
   box.classList.toggle('warn', !!problem && !problem.on);

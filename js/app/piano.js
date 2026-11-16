@@ -74,7 +74,8 @@ export let kbOctave = 60;
 export function bindComputerKeyboard() {
   const down = new Map();
   window.addEventListener('keydown', e => {
-    if (e.target.tagName === 'INPUT' || e.repeat || e.ctrlKey || e.metaKey) return;
+    // Pas dans un champ de saisie, un menu déroulant ou une zone éditable (on y tape du texte, pas des notes).
+    if (e.target.closest?.('input, textarea, select, [contenteditable]') || e.repeat || e.ctrlKey || e.metaKey) return;
     if (e.key === 'Shift') setShiftHeld(true);
     if (e.code === 'KeyZ') { kbOctave = Math.max(24, kbOctave - 12); return; }
     if (e.code === 'KeyX') { kbOctave = Math.min(96, kbOctave + 12); return; }
@@ -90,6 +91,12 @@ export function bindComputerKeyboard() {
     if (note === undefined) return;
     down.delete(e.code);
     playNote(note, 0, false);
+  });
+  // Fenêtre quittée (Alt+Tab, clic ailleurs) touche enfoncée : le relâchement n'arrivera jamais, les notes sont coupées.
+  window.addEventListener('blur', () => {
+    for (const note of down.values()) playNote(note, 0, false);
+    down.clear();
+    setShiftHeld(false);
   });
 }
 

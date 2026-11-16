@@ -19,7 +19,17 @@ const toDataUrl = bytes => new Promise((resolve, reject) => {
   r.onerror = () => reject(r.error);
   r.readAsDataURL(new Blob([bytes], { type: 'application/octet-stream' }));
 });
-const fromDataUrl = url => fetch(url).then(r => r.arrayBuffer());
+// Son embarqué : une URL « data: » en base64, décodée sur place (un fichier ne déclenche jamais de requête réseau).
+export const fromDataUrl = url => {
+  const m = typeof url === 'string' ? /^data:[^,;]*(?:;[^,;]*)*;base64,/.exec(url) : null;
+  if (!m) return null;
+  try {
+    const bin = atob(url.slice(m[0].length));
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes.buffer;
+  } catch { return null; }
+};
 
 // Sons à embarquer : ceux qui ne viennent pas de l'application.
 export const embeddable = id => typeof id === 'string' && /^(user|rec):/.test(id);
@@ -38,11 +48,12 @@ export async function packFile(kind, data, sampleIds, loadSample) {
 export async function readFile(file) {
   let json;
   try { json = JSON.parse(await file.text()); } catch { throw new Error(t('file.bad')); }
-  if (![FILE_FORMAT, ...OLD_FORMATS].includes(json?.format) || !FILE_KINDS.includes(json.kind) || typeof json.data !== 'object') throw new Error(t('file.bad'));
+  if (![FILE_FORMAT, ...OLD_FORMATS].includes(json?.format) || !FILE_KINDS.includes(json.kind) || !json.data || typeof json.data !== 'object' || Array.isArray(json.data)) throw new Error(t('file.bad'));
   const samples = {};
   for (const [id, s] of Object.entries(json.samples ?? {})) {
     if (!embeddable(id) || typeof s?.audio !== 'string') continue;
-    samples[id] = { name: String(s.name ?? ''), data: await fromDataUrl(s.audio) };
+    const data = fromDataUrl(s.audio);
+    if (data) samples[id] = { name: String(s.name ?? '').slice(0, 80), data };
   }
   return { kind: json.kind, data: json.data, samples };
 }

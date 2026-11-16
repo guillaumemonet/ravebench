@@ -43,6 +43,7 @@ import { cleanMidiMap } from './midi-ui.js';
 import { mergeViz } from './viz-ui.js';
 import { cleanSmp } from '../sampler.js';
 import { mergeStart } from '../songstart.js';
+import { toast } from './misc.js';
 
 // ---------- Sauvegarde ----------
 
@@ -102,12 +103,12 @@ export async function restore() {
     state.midiClock = { out: typeof saved.midiClock?.out === 'string' ? saved.midiClock.out : '', in: typeof saved.midiClock?.in === 'string' ? saved.midiClock.in : '' };
     state.padQuant = PAD_QUANTS.includes(saved.padQuant) ? saved.padQuant : 0;
     state.curves = (Array.isArray(saved.curves) ? saved.curves : []).map(cleanCurve).filter(c => c?.id?.startsWith('u:'));
-    state.userSounds = Array.isArray(saved.userSounds) ? saved.userSounds.filter(s => typeof s?.sampleId === 'string' && s.sampleId.startsWith('user:')) : [];
+    state.userSounds = Array.isArray(saved.userSounds) ? saved.userSounds.filter(s => typeof s?.sampleId === 'string' && s.sampleId.startsWith('user:')).map(s => ({ ...s, name: String(s.name ?? '').slice(0, 64) })) : [];
     for (let b = 0; b < BANKS; b++) {
       for (let i = 0; i < 40; i++) {
         const s = saved.banks?.[b]?.[i];
         if (!s) continue;
-        const pad = { bpm: 0, ...s, p: { ...defaultPositions('pad'), ...s.p }, buffer: null };
+        const pad = { bpm: 0, ...s, name: String(s.name ?? '').slice(0, 64), p: { ...defaultPositions('pad'), ...s.p }, buffer: null };
         if (pad.smp) pad.smp = cleanSmp(pad.smp) ?? undefined;   // instrument échantillon (js/sampler.js)
         if (pad.name === 'Thunderdome') pad.name = soundName('Arena kick');   // ancien nom (une marque) du kick de la banque Oldschool
         state.banks[b][i] = pad;
@@ -235,12 +236,43 @@ export let projectLoading = false;   // un projet ouvert remplace tout : plus ri
 export function save() {
   if (projectLoading) return;
   if (!tlRec) tlHistory?.commit();
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    store.saveState(stateSnapshot()).catch(err => console.warn('Save failed', err));
-    store.saveMine(mySnapshot()).catch(err => console.warn('Save failed', err));
-  }, 400);
+  saveSettings();
 }
+
+// Un réglage tourné en continu (potentiomètre, fader, contrôleur MIDI) : enregistré, mais sans étape d'annulation.
+// Les réglages ne font pas partie de ce qu'« Annuler » ramène : l'instantané (toute la timeline, les pads, les
+// patterns…) serait recalculé à chaque cran pour rien, sur le fil qui nourrit le séquenceur.
+export function saveSettings() {
+  if (projectLoading) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(writeNow, 400);
+}
+
+// Écriture dans le navigateur. Un échec (disque plein, navigation privée…) est signalé à l'écran, une fois par minute
+// au plus, au lieu de passer inaperçu.
+let pending = false, failShown = 0;
+function writeNow() {
+  clearTimeout(saveTimer);
+  saveTimer = 0;
+  pending = true;
+  Promise.all([store.saveState(stateSnapshot()), store.saveMine(mySnapshot())])
+    .then(() => { pending = false; if (failShown) { failShown = 0; toast(t('save.ok'), 2500); } })
+    .catch(err => {
+      pending = false;
+      console.warn('Save failed', err);
+      if (Date.now() - failShown > 60000) { failShown = Date.now(); toast(t('save.failed', { msg: err?.message ?? err }), 12000); }
+    });
+}
+
+// Onglet fermé ou masqué : une sauvegarde en attente part tout de suite (au lieu d'être perdue avec ses 400 ms).
+export function bindSaveFlush() {
+  const flush = () => { if (saveTimer && !projectLoading) writeNow(); };
+  addEventListener('pagehide', flush);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
+  // Demande au navigateur de garder les données (sinon Firefox peut les effacer quand le disque manque de place).
+  navigator.storage?.persist?.().catch(() => {});
+}
+export const savePending = () => pending || !!saveTimer;
 
 // Variables modifiées depuis d'autres modules.
 export function setProjectLoading(v) { return (projectLoading = v); }

@@ -12,6 +12,9 @@ Common problems and rebuilding the sound banks.
 | "Port unavailable" | Another app (Ableton, FL Studio…) is using the APC. On Windows a MIDI port cannot be shared, so close that app and reload. |
 | Detected but pads do nothing | Unplug the APC, wait 10 seconds, plug it into another USB port, then reload. Windows' MIDI service can stop delivering input after sleep or hot-plugging. |
 | No sound | Click **Start** first: browsers block audio until a click. |
+| A note keeps sounding / everything must stop now | **Stop all** (red button next to REC in the header) cuts every sound at once. |
+| "Your work could not be saved" | The browser refuses to save (disk full, private browsing): export the project with 💾, free some disk space, then reload. |
+| The application stays on the start screen with an error | **Download the save** to keep it, then **Start with an empty project** (the old save is put aside, not deleted). |
 | A new sound bank does not appear | Restart `start.bat` / `start.sh`, then reload. New library banks go to their planned bank if it is empty, otherwise to the first empty bank (a message tells you which). |
 | See what the APC sends | Open the **MIDI** window: its monitor shows the last messages received. |
 | The visualizer's projector window does not open | The browser blocked the pop-up: allow pop-ups for this page (icon in the address bar), then click **Projector** again. |

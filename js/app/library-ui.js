@@ -71,7 +71,7 @@ function chip(cls, label, color, count, active, onClick) {
   const btn = document.createElement('button');
   btn.className = cls + (active ? ' active' : '');
   btn.style.setProperty('--c', color);
-  btn.innerHTML = `<i></i>${label}<small>${count}</small>`;
+  btn.append(document.createElement('i'), label, Object.assign(document.createElement('small'), { textContent: count }));
   btn.addEventListener('click', onClick);
   return btn;
 }
@@ -123,7 +123,8 @@ export function renderLibrary() {
     row.dataset.id = item.sampleId;
     row.style.setProperty('--c', item.kind === 'fx' ? fxColor(item) : familyColor(item.family));
     const small = item.kind === 'fx' ? t(`tfx.family.${item.family}`) : [item.note, item.loop ? t('lib.bars', { n: item.bars || '↻' }) : t('lib.oneshot')].filter(Boolean).join(' · ');
-    row.innerHTML = `<i></i><span>${item.name}</span><small>${small}</small>`;
+    // Texte brut : le nom vient parfois d'un fichier ouvert (jamais interprété comme du HTML).
+    row.append(document.createElement('i'), Object.assign(document.createElement('span'), { textContent: item.name ?? '' }), Object.assign(document.createElement('small'), { textContent: small }));
     if (item.kind === 'fx') row.title = t(item.curveId ? 'curve.libTitle' : 'tfx.libTitle');
     else row.title = [`${item.family} › ${item.type}`, item.bpm ? `${item.bpm} BPM` : '', (item.tags ?? []).join(', ')].filter(Boolean).join(' · ');
     if (item.curveId) {
